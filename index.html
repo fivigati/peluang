@@ -67,7 +67,22 @@
         .rank-1 { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
         .rank-2 { color: #e2e8f0; text-shadow: 0 0 10px rgba(226, 232, 240, 0.5); }
         .rank-3 { color: #d97706; text-shadow: 0 0 10px rgba(217, 119, 6, 0.5); }
-    </style>
+
+        .leaderboard-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        @media (max-width: 768px) {
+            .leaderboard-container { grid-template-columns: 1fr; }
+        }
+        .compact-table tr {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .compact-table td {
+            padding: 0.5rem 0.75rem;
+        }
+</style>
 </head>
 <body class="text-slate-100 min-h-screen overflow-hidden space-bg">
 <div class="stars-overlay"></div>
@@ -75,60 +90,163 @@
 <script>
     const questionBank = {
         box1: [
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian muncul jumlah mata dadu 9 adalah ....", o: ["3","4","5","6"], a: 1},
-            {q: "Sebuah koin dilempar empat kali. Banyak kejadian muncul tepat tiga gambar adalah ....", o: ["2","3","4","5"], a: 2},
-            {q: "Sebuah kartu bernomor 1 sampai 20 diambil satu kartu. Banyak kejadian terambil bilangan prima adalah ....", o: ["6","7","8","9"], a: 2},
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian muncul pasangan bilangan genap adalah ....", o: ["6","8","9","12"], a: 2},
-            {q: "Sebuah bilangan dipilih dari 1 sampai 40. Banyak kejadian terambil kelipatan 5 adalah ....", o: ["6","7","8","9"], a: 2},
-            {q: "Tiga buah koin dilempar bersama-sama. Banyak kejadian muncul paling sedikit satu gambar adalah ....", o: ["6","7","8","9"], a: 1},
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian jumlah mata dadu lebih dari 9 adalah ....", o: ["5","6","7","8"], a: 1},
-            {q: "Sebuah huruf dipilih dari kata “SEKOLAH”. Banyak kejadian terambil huruf vokal adalah ....", o: ["2","3","4","5"], a: 1},
-            {q: "Sebuah spinner memiliki warna merah, biru, hijau, kuning, ungu, dan putih. Banyak kejadian muncul warna selain merah adalah ....", o: ["3","4","5","6"], a: 2},
-            {q: "Sebuah dadu dilempar dua kali. Banyak kejadian jumlah kedua mata dadu merupakan bilangan genap adalah ....", o: ["16","18","20","22"], a: 1},
-            {q: "Dua buah koin dilempar bersama-sama. Banyak kejadian komplemen muncul dua angka adalah ....", o: ["1","2","3","4"], a: 2},
-            {q: "Sebuah kartu bernomor 1 sampai 30 diambil satu kartu. Banyak kejadian komplemen terambil bilangan ganjil adalah ....", o: ["14","15","16","17"], a: 1},
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian komplemen jumlah mata dadu 8 adalah ....", o: ["30","31","32","33"], a: 1},
-            {q: "Sebuah bilangan dipilih dari 1 sampai 50. Banyak kejadian terambil bilangan kelipatan 4 tetapi bukan kelipatan 2 adalah ....", o: ["0","1","2","3"], a: 0},
-            {q: "Tiga buah koin dilempar bersama-sama. Banyak kejadian muncul tepat dua gambar adalah ....", o: ["2","3","4","5"], a: 1},
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian hasil kali kedua mata dadu ganjil adalah ....", o: ["6","8","9","12"], a: 2},
-            {q: "Sebuah kartu bernomor 1 sampai 30 diambil satu kartu. Banyak kejadian terambil faktor dari 18 adalah ....", o: ["4","5","6","7"], a: 2},
-            {q: "Sebuah huruf dipilih dari kata “MATEMATIKA”. Banyak kejadian komplemen terambil huruf vokal adalah ....", o: ["3","4","5","6"], a: 1},
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian jumlah mata dadu merupakan kelipatan 4 adalah ....", o: ["8","9","10","11"], a: 1},
-            {q: "Sebuah bilangan dipilih dari 1 sampai 30. Banyak kejadian terambil bilangan prima genap adalah ....", o: ["1","2","3","4"], a: 0}
+    {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian muncul jumlah mata dadu 9 adalah ....", o: ["3","4","5","6"], a: 1},
+    {q: "Sebuah koin dilempar empat kali. Banyak kejadian muncul tepat tiga gambar adalah ....", o: ["2","3","4","5"], a: 2},
+    {q: "Sebuah kartu bernomor 1 sampai 20 diambil satu kartu. Banyak kejadian terambil bilangan prima adalah ....", o: ["6","7","8","9"], a: 2},
+    {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian muncul pasangan bilangan genap adalah ....", o: ["6","8","9","12"], a: 2},
+    {q: "Sebuah bilangan dipilih dari 1 sampai 40. Banyak kejadian terambil kelipatan 5 adalah ....", o: ["6","7","8","9"], a: 2},
+    {q: "Tiga buah koin dilempar bersama-sama. Banyak kejadian muncul paling sedikit satu gambar adalah ....", o: ["6","7","8","9"], a: 1},
+    {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian jumlah mata dadu lebih dari 9 adalah ....", o: ["5","6","7","8"], a: 1},
+    {q: "Sebuah huruf dipilih dari kata “SEKOLAH”. Banyak kejadian terambil huruf vokal adalah ....", o: ["2","3","4","5"], a: 1},
+    {q: "Sebuah spinner memiliki warna merah, biru, hijau, kuning, ungu, dan putih. Banyak kejadian muncul warna selain merah adalah ....", o: ["3","4","5","6"], a: 2},
+    {q: "Sebuah dadu dilempar dua kali. Banyak kejadian jumlah kedua mata dadu merupakan bilangan genap adalah ....", o: ["16","18","20","22"], a: 1},
+    {q: "Dua buah koin dilempar bersama-sama. Banyak kejadian komplemen muncul dua angka adalah ....", o: ["1","2","3","4"], a: 2},
+    {q: "Sebuah kartu bernomor 1 sampai 30 diambil satu kartu. Banyak kejadian komplemen terambil bilangan ganjil adalah ....", o: ["14","15","16","17"], a: 1},
+    {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian komplemen jumlah mata dadu 8 adalah ....", o: ["30","31","32","33"], a: 1},
+    {q: "Sebuah bilangan dipilih dari 1 sampai 50. Banyak kejadian terambil bilangan kelipatan 4 tetapi bukan kelipatan 2 adalah ....", o: ["0","1","2","3"], a: 0},
+    {q: "Tiga buah koin dilempar bersama-sama. Banyak kejadian muncul tepat dua gambar adalah ....", o: ["2","3","4","5"], a: 1},
+    {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian hasil kali kedua mata dadu ganjil adalah ....", o: ["6","8","9","12"], a: 2},
+    {q: "Sebuah kartu bernomor 1 sampai 30 diambil satu kartu. Banyak kejadian terambil faktor dari 18 adalah ....", o: ["4","5","6","7"], a: 2},
+    {q: "Sebuah huruf dipilih dari kata “MATEMATIKA”. Banyak kejadian komplemen terambil huruf vokal adalah ....", o: ["3","4","5","6"], a: 1},
+    {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian jumlah mata dadu merupakan kelipatan 4 adalah ....", o: ["8","9","10","11"], a: 1},
+    {q: "Sebuah bilangan dipilih dari 1 sampai 30. Banyak kejadian terambil bilangan prima genap adalah ....", o: ["1","2","3","4"], a: 0},
+    {q: "Tiga buah koin dilempar bersama-sama. Banyak ruang sampel yang mungkin adalah ....", o: ["6","8","10","12"], a: 1},
+    {q: "Sebuah spinner memiliki 5 warna dan sebuah dadu dilempar bersama-sama. Banyak ruang sampel yang mungkin adalah ....", o: ["20","25","30","35"], a: 2},
+    {q: "Dua kartu diambil berturut-turut dari kartu bernomor 1 sampai 6 tanpa pengembalian. Banyak ruang sampel yang mungkin adalah ....", o: ["20","24","30","36"], a: 2},
+    {q: "Sebuah dadu dilempar tiga kali. Banyak ruang sampel yang mungkin adalah ....", o: ["36","72","108","216"], a: 3},
+    {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian jumlah mata dadu 5 adalah ....", o: ["2","3","4","5"], a: 2},
+    {q: "Sebuah kartu bernomor 1 sampai 12 diambil satu kartu. Banyak kejadian terambil bilangan genap adalah ....", o: ["4","5","6","7"], a: 2},
+    {q: "Sebuah bilangan dipilih dari 1 sampai 25. Banyak kejadian terambil kelipatan 3 adalah ....", o: ["6","7","8","9"], a: 2},
+    {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian muncul minimal satu angka 6 adalah ....", o: ["9","10","11","12"], a: 1},
+    {q: "Sebuah huruf dipilih dari kata “INDONESIA”. Banyak kejadian terambil huruf konsonan adalah ....", o: ["3","4","5","6"], a: 1},
+    {q: "Tiga buah koin dilempar bersama-sama. Banyak kejadian muncul semua gambar adalah ....", o: ["1","2","3","4"], a: 0},
+    {q: "Sebuah dadu dilempar satu kali. Banyak kejadian muncul mata dadu kurang dari 5 adalah ....", o: ["2","3","4","5"], a: 2},
+    {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian jumlah mata dadu 10 adalah ....", o: ["2","3","4","5"], a: 1},
+    {q: "Sebuah kartu bernomor 1 sampai 18 diambil satu kartu. Banyak kejadian terambil bilangan kelipatan 6 adalah ....", o: ["2","3","4","5"], a: 1},
+    {q: "Sebuah spinner memiliki 8 bagian sama besar. Banyak kejadian muncul warna tertentu adalah ....", o: ["1","2","4","8"], a: 0},
+    {q: "Dua buah koin dilempar bersama-sama. Banyak ruang sampel yang mungkin adalah ....", o: ["2","4","6","8"], a: 1},
+    {q: "Sebuah dadu dan sebuah koin dilempar bersama-sama. Banyak ruang sampel yang mungkin adalah ....", o: ["6","8","10","12"], a: 3},
+    {q: "Dua kartu diambil dari kartu bernomor 1 sampai 4 dengan pengembalian. Banyak ruang sampel yang mungkin adalah ....", o: ["8","12","16","20"], a: 2},
+    {q: "Sebuah bilangan dipilih dari 1 sampai 15. Banyak kejadian terambil faktor dari 12 adalah ....", o: ["4","5","6","7"], a: 2},
+    {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian jumlah mata dadu kurang dari 4 adalah ....", o: ["2","3","4","5"], a: 1},
+    {q: "Tiga buah koin dilempar bersama-sama. Banyak kejadian muncul tepat tiga angka adalah ....", o: ["1","2","3","4"], a: 0},
+    {q: "Sebuah huruf dipilih dari kata “PELUANG”. Banyak kejadian terambil huruf vokal adalah ....", o: ["2","3","4","5"], a: 2},
+    {q: "Sebuah kartu bernomor 1 sampai 16 diambil satu kartu. Banyak kejadian terambil bilangan kuadrat sempurna adalah ....", o: ["2","3","4","5"], a: 2},
+    {q: "Sebuah dadu dilempar dua kali. Banyak kejadian kedua mata dadu sama adalah ....", o: ["4","5","6","7"], a: 2},
+    {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian jumlah mata dadu ganjil adalah ....", o: ["16","18","20","22"], a: 1},
+    {q: "Sebuah bilangan dipilih dari 1 sampai 60. Banyak kejadian terambil kelipatan 10 adalah ....", o: ["4","5","6","7"], a: 2},
+    {q: "Sebuah koin dilempar lima kali. Banyak ruang sampel yang mungkin adalah ....", o: ["16","24","32","64"], a: 2},
+    {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian hasil jumlah mata dadu 11 adalah ....", o: ["1","2","3","4"], a: 1},
+    {q: "Sebuah kartu bernomor 1 sampai 24 diambil satu kartu. Banyak kejadian terambil bilangan prima kurang dari 10 adalah ....", o: ["3","4","5","6"], a: 1},
+    {q: "Sebuah spinner memiliki 10 bagian sama besar. Banyak kejadian muncul bukan warna merah jika hanya ada 1 merah adalah ....", o: ["7","8","9","10"], a: 2},
+    {q: "Dua buah koin dilempar tiga kali. Banyak ruang sampel yang mungkin adalah ....", o: ["16","32","64","128"], a: 2}
         ],
         box2: [
-            {q: "Sebuah dadu dilempar satu kali. Peluang muncul mata dadu ganjil adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 2},
-            {q: "Sebuah koin dilempar dua kali. Peluang muncul dua gambar adalah ....", o: ["1/4","1/3","1/2","3/4"], a: 0},
-            {q: "Sebuah kartu bernomor 1 sampai 12 diambil satu kartu. Peluang terambil bilangan prima adalah ....", o: ["1/6","1/3","5/12","1/2"], a: 2},
-            {q: "Dua buah dadu dilempar bersama-sama. Peluang jumlah mata dadu 8 adalah ....", o: ["1/12","5/36","1/6","7/36"], a: 1},
-            {q: "Sebuah spinner memiliki 5 warna sama besar. Peluang muncul warna biru adalah ....", o: ["1/3","1/4","1/5","1/6"], a: 2},
-            {q: "Sebuah bilangan dipilih dari 1 sampai 20. Peluang terambil kelipatan 4 adalah ....", o: ["1/5","1/4","3/10","2/5"], a: 1},
-            {q: "Tiga buah koin dilempar bersama-sama. Peluang muncul semua angka adalah ....", o: ["1/8","1/4","3/8","1/2"], a: 0},
-            {q: "Sebuah dadu dilempar satu kali. Peluang muncul mata dadu kurang dari 3 adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 1},
-            {q: "Dua buah dadu dilempar bersama-sama. Peluang muncul pasangan bilangan genap adalah ....", o: ["1/6","1/4","1/3","1/2"], a: 1},
-            {q: "Sebuah kartu bernomor 1 sampai 15 diambil satu kartu. Peluang terambil bilangan ganjil adalah ....", o: ["6/15","7/15","8/15","9/15"], a: 2},
-            {q: "Peluang seorang siswa hadir tepat waktu adalah 0,85. Peluang siswa terlambat adalah ....", o: ["0,05","0,10","0,15","0,20"], a: 2},
-            {q: "Peluang sebuah mesin bekerja baik adalah 0,92. Peluang mesin rusak adalah ....", o: ["0,02","0,04","0,08","0,12"], a: 2},
-            {q: "Peluang muncul bilangan prima pada pelemparan dadu adalah 1/2. Peluang tidak muncul bilangan prima adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 2},
-            {q: "Dalam 80 kali pelemparan koin, muncul gambar sebanyak 32 kali. Peluang empiris muncul gambar adalah ....", o: ["2/5","3/5","1/2","4/5"], a: 0},
-            {q: "Sebuah dadu dilempar 50 kali dan muncul mata dadu 2 sebanyak 10 kali. Peluang empiris muncul mata dadu 2 adalah ....", o: ["1/10","1/5","1/4","1/2"], a: 1}
-        ],
+    {q: "Sebuah dadu dilempar satu kali. Peluang muncul mata dadu ganjil adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 2},
+    {q: "Sebuah koin dilempar dua kali. Peluang muncul dua gambar adalah ....", o: ["1/4","1/3","1/2","3/4"], a: 0},
+    {q: "Sebuah kartu bernomor 1 sampai 12 diambil satu kartu. Peluang terambil bilangan prima adalah ....", o: ["1/6","1/3","5/12","1/2"], a: 2},
+    {q: "Dua buah dadu dilempar bersama-sama. Peluang jumlah mata dadu 8 adalah ....", o: ["1/12","5/36","1/6","7/36"], a: 1},
+    {q: "Sebuah spinner memiliki 5 warna sama besar. Peluang muncul warna biru adalah ....", o: ["1/3","1/4","1/5","1/6"], a: 2},
+    {q: "Sebuah bilangan dipilih dari 1 sampai 20. Peluang terambil kelipatan 4 adalah ....", o: ["1/5","1/4","3/10","2/5"], a: 1},
+    {q: "Tiga buah koin dilempar bersama-sama. Peluang muncul semua angka adalah ....", o: ["1/8","1/4","3/8","1/2"], a: 0},
+    {q: "Sebuah dadu dilempar satu kali. Peluang muncul mata dadu kurang dari 3 adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 1},
+    {q: "Dua buah dadu dilempar bersama-sama. Peluang muncul pasangan bilangan genap adalah ....", o: ["1/6","1/4","1/3","1/2"], a: 1},
+    {q: "Sebuah kartu bernomor 1 sampai 15 diambil satu kartu. Peluang terambil bilangan ganjil adalah ....", o: ["6/15","7/15","8/15","9/15"], a: 2},
+    {q: "Sebuah bola diambil dari kotak berisi 6 bola merah dan 4 bola putih. Peluang terambil bola putih adalah ....", o: ["1/5","2/5","3/5","4/5"], a: 1},
+    {q: "Peluang seorang siswa hadir tepat waktu adalah 0,85. Peluang siswa terlambat adalah ....", o: ["0,05","0,10","0,15","0,20"], a: 2},
+    {q: "Peluang sebuah mesin bekerja baik adalah 0,92. Peluang mesin rusak adalah ....", o: ["0,02","0,04","0,08","0,12"], a: 2},
+    {q: "Peluang turun hujan hari ini adalah 0,4. Peluang tidak turun hujan adalah ....", o: ["0,4","0,5","0,6","0,7"], a: 2},
+    {q: "Peluang muncul bilangan prima pada pelemparan dadu adalah 1/2. Peluang tidak muncul bilangan prima adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 2},
+    {q: "Dalam 80 kali pelemparan koin, muncul gambar sebanyak 32 kali. Peluang empiris muncul gambar adalah ....", o: ["2/5","3/5","1/2","4/5"], a: 0},
+    {q: "Sebuah dadu dilempar 50 kali dan muncul mata dadu 2 sebanyak 10 kali. Peluang empiris muncul mata dadu 2 adalah ....", o: ["1/10","1/5","1/4","1/2"], a: 1},
+    {q: "Dalam 100 percobaan, bola merah terambil 25 kali. Peluang empiris terambil bola merah adalah ....", o: ["1/5","1/4","3/10","2/5"], a: 1},
+    {q: "Sebuah spinner diputar 60 kali dan warna hijau muncul 15 kali. Peluang empiris muncul warna hijau adalah ....", o: ["1/5","1/4","1/3","2/5"], a: 1},
+    {q: "Sebuah koin dilempar 120 kali dan muncul angka sebanyak 72 kali. Peluang empiris muncul angka adalah ....", o: ["1/2","3/5","2/3","3/4"], a: 1},
+    {q: "Sebuah dadu dilempar satu kali. Peluang muncul mata dadu 6 adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 0},
+    {q: "Dua buah koin dilempar bersama-sama. Peluang muncul satu gambar dan satu angka adalah ....", o: ["1/4","1/2","3/4","1"], a: 1},
+    {q: "Sebuah kartu bernomor 1 sampai 8 diambil satu kartu. Peluang terambil bilangan genap adalah ....", o: ["1/4","1/3","1/2","2/3"], a: 2},
+    {q: "Sebuah spinner memiliki 8 bagian sama besar. Peluang muncul satu warna tertentu adalah ....", o: ["1/6","1/7","1/8","1/9"], a: 2},
+    {q: "Dua buah dadu dilempar bersama-sama. Peluang jumlah mata dadu 12 adalah ....", o: ["1/36","1/18","1/12","1/6"], a: 0},
+    {q: "Peluang seorang pemain menang adalah 0,65. Peluang pemain kalah adalah ....", o: ["0,25","0,30","0,35","0,40"], a: 2},
+    {q: "Peluang sebuah lampu menyala adalah 7/8. Peluang lampu tidak menyala adalah ....", o: ["1/8","2/8","3/8","4/8"], a: 0},
+    {q: "Sebuah bilangan dipilih dari 1 sampai 25. Peluang terambil kelipatan 5 adalah ....", o: ["1/5","2/5","3/5","4/5"], a: 0},
+    {q: "Tiga buah koin dilempar bersama-sama. Peluang muncul tepat dua gambar adalah ....", o: ["1/8","1/4","3/8","1/2"], a: 2},
+    {q: "Dua buah dadu dilempar bersama-sama. Peluang muncul pasangan bilangan sama adalah ....", o: ["1/12","1/9","1/6","1/3"], a: 2},
+    {q: "Sebuah kartu bernomor 1 sampai 20 diambil satu kartu. Peluang terambil bilangan prima kurang dari 10 adalah ....", o: ["1/5","1/4","3/10","2/5"], a: 0},
+    {q: "Sebuah dadu dilempar dua kali. Peluang jumlah kedua mata dadu 5 adalah ....", o: ["1/9","1/6","5/36","7/36"], a: 0},
+    {q: "Sebuah bola diambil dari kotak berisi 9 bola hijau dan 1 bola merah. Peluang terambil bola merah adalah ....", o: ["1/10","1/9","1/8","1/5"], a: 0},
+    {q: "Peluang seorang siswa lulus adalah 0,95. Peluang siswa tidak lulus adalah ....", o: ["0,02","0,03","0,05","0,08"], a: 2},
+    {q: "Peluang sebuah tim menang adalah 5/8. Peluang tim tidak menang adalah ....", o: ["1/8","2/8","3/8","4/8"], a: 2},
+    {q: "Dalam 40 kali percobaan, muncul warna biru sebanyak 8 kali. Peluang empiris warna biru adalah ....", o: ["1/5","1/4","3/10","2/5"], a: 0},
+    {q: "Sebuah dadu dilempar 90 kali dan muncul mata dadu 4 sebanyak 18 kali. Peluang empiris muncul mata dadu 4 adalah ....", o: ["1/10","1/5","1/4","1/3"], a: 1},
+    {q: "Sebuah kartu diambil dari kartu bernomor 1 sampai 16. Peluang terambil bilangan kuadrat sempurna adalah ....", o: ["1/8","1/4","3/8","1/2"], a: 1},
+    {q: "Dua buah dadu dilempar bersama-sama. Peluang jumlah mata dadu kurang dari 5 adalah ....", o: ["1/12","1/6","5/18","1/3"], a: 2},
+    {q: "Sebuah koin dilempar tiga kali. Peluang muncul tepat satu angka adalah ....", o: ["1/8","1/4","3/8","1/2"], a: 2},
+    {q: "Sebuah bilangan dipilih dari 1 sampai 30. Peluang terambil bilangan prima genap adalah ....", o: ["1/30","1/15","1/10","1/5"], a: 1},
+    {q: "Peluang bus datang tepat waktu adalah 0,88. Peluang bus terlambat adalah ....", o: ["0,10","0,12","0,15","0,18"], a: 1},
+    {q: "Peluang sebuah printer rusak adalah 0,03. Peluang printer tidak rusak adalah ....", o: ["0,90","0,93","0,97","0,99"], a: 2},
+    {q: "Dalam 70 kali pelemparan koin, muncul angka sebanyak 35 kali. Peluang empiris muncul angka adalah ....", o: ["1/3","1/2","2/3","3/4"], a: 1},
+    {q: "Sebuah spinner diputar 100 kali dan warna merah muncul 40 kali. Peluang empiris warna merah adalah ....", o: ["1/5","2/5","3/5","4/5"], a: 1},
+    {q: "Dua buah koin dilempar bersama-sama. Peluang muncul minimal satu gambar adalah ....", o: ["1/4","1/2","3/4","1"], a: 2},
+    {q: "Sebuah dadu dilempar satu kali. Peluang muncul bilangan kurang dari 7 adalah ....", o: ["1/2","2/3","5/6","1"], a: 3},
+    {q: "Sebuah kartu bernomor 1 sampai 9 diambil satu kartu. Peluang terambil bilangan ganjil adalah ....", o: ["4/9","5/9","6/9","7/9"], a: 1},
+    {q: "Peluang seorang pemain gagal penalti adalah 0,25. Peluang pemain berhasil penalti adalah ....", o: ["0,25","0,50","0,75","1"], a: 2},
+    {q: "Dalam 200 percobaan, sebuah bola putih terambil 50 kali. Peluang empiris bola putih adalah ....", o: ["1/5","1/4","3/10","2/5"], a: 1},
+    {q: "Dua buah dadu dilempar bersama-sama. Peluang hasil kali kedua mata dadu genap adalah ....", o: ["1/4","1/2","3/4","5/6"], a: 2}
+],
         box3: [
-            {q: "Sebuah dadu dilempar 120 kali. Frekuensi harapan muncul mata dadu 4 adalah ....", o: ["10","15","20","25"], a: 2},
-            {q: "Sebuah koin dilempar 60 kali. Frekuensi harapan muncul angka adalah ....", o: ["20","25","30","35"], a: 2},
-            {q: "Sebuah dadu dilempar 84 kali. Frekuensi harapan muncul bilangan ganjil adalah ....", o: ["28","36","42","48"], a: 2},
-            {q: "Dua buah koin dilempar bersama-sama sebanyak 100 kali. Frekuensi harapan muncul dua gambar adalah ....", o: ["20","25","30","35"], a: 1},
-            {q: "Sebuah kartu bernomor 1 sampai 12 diambil acak sebanyak 48 kali. Frekuensi harapan terambil bilangan prima adalah ....", o: ["12","16","20","24"], a: 2},
-            {q: "Sebuah spinner memiliki 6 warna sama besar. Spinner diputar 180 kali. Frekuensi harapan muncul warna merah adalah ....", o: ["20","30","40","50"], a: 1},
-            {q: "Sebuah dadu dilempar 96 kali. Frekuensi harapan muncul bilangan kurang dari 4 adalah ....", o: ["24","36","48","60"], a: 2},
-            {q: "Dua buah dadu dilempar bersama-sama sebanyak 144 kali. Frekuensi harapan jumlah mata dadu 7 adalah ....", o: ["12","18","24","30"], a: 2},
-            {q: "Sebuah koin dilempar 200 kali. Frekuensi harapan muncul gambar adalah ....", o: ["50","75","100","125"], a: 2},
-            {q: "Peluang muncul mata dadu prima adalah 1/2. Jika sebuah dadu dilempar 80 kali, frekuensi harapan muncul mata dadu prima adalah ....", o: ["20","30","40","50"], a: 2},
-            {q: "Peluang pemain sepak bola berhasil mencetak gol penalti 0,75. Jika melakukan 40 tendangan, frekuensi harapan gagal adalah ....", o: ["5","10","15","20"], a: 1},
-            {q: "Peluang siswa terlambat 0,08. Jika ada 200 hari sekolah, frekuensi harapan datang tepat waktu adalah ....", o: ["168","176","184","192"], a: 3},
-            {q: "Peluang turun hujan hari ini 0,3. Selama 50 hari, frekuensi harapan hari tidak hujan adalah ....", o: ["25","30","35","40"], a: 2},
-            {q: "Peluang mesin menghasilkan barang cacat 0,05. Jika mesin menghasilkan 400 barang, frekuensi harapan barang baik adalah ....", o: ["360","370","380","390"], a: 2}
-        ]
+    {q: "Sebuah dadu dilempar 120 kali. Frekuensi harapan muncul mata dadu 4 adalah ....", o: ["10","15","20","25"], a: 2},
+    {q: "Sebuah koin dilempar 60 kali. Frekuensi harapan muncul angka adalah ....", o: ["20","25","30","35"], a: 2},
+    {q: "Sebuah dadu dilempar 84 kali. Frekuensi harapan muncul bilangan ganjil adalah ....", o: ["28","36","42","48"], a: 2},
+    {q: "Dua buah koin dilempar bersama-sama sebanyak 100 kali. Frekuensi harapan muncul dua gambar adalah ....", o: ["20","25","30","35"], a: 1},
+    {q: "Sebuah kartu bernomor 1 sampai 12 diambil acak sebanyak 48 kali. Frekuensi harapan terambil bilangan prima adalah ....", o: ["12","16","20","24"], a: 2},
+    {q: "Sebuah spinner memiliki 6 warna sama besar. Spinner diputar 180 kali. Frekuensi harapan muncul warna merah adalah ....", o: ["20","30","40","50"], a: 1},
+    {q: "Sebuah dadu dilempar 96 kali. Frekuensi harapan muncul bilangan kurang dari 4 adalah ....", o: ["24","36","48","60"], a: 2},
+    {q: "Dua buah dadu dilempar bersama-sama sebanyak 144 kali. Frekuensi harapan jumlah mata dadu 7 adalah ....", o: ["12","18","24","30"], a: 2},
+    {q: "Sebuah koin dilempar 200 kali. Frekuensi harapan muncul gambar adalah ....", o: ["50","75","100","125"], a: 2},
+    {q: "Sebuah kartu bernomor 1 sampai 25 diambil acak sebanyak 100 kali. Frekuensi harapan terambil kelipatan 5 adalah ....", o: ["10","15","20","25"], a: 2},
+    {q: "Peluang muncul mata dadu prima adalah 1/2. Jika sebuah dadu dilempar 80 kali, frekuensi harapan muncul mata dadu prima adalah ....", o: ["20","30","40","50"], a: 2},
+    {q: "Peluang pemain sepak bola berhasil mencetak gol penalti 0,75. Jika melakukan 40 tendangan, frekuensi harapan gagal adalah ....", o: ["5","10","15","20"], a: 1},
+    {q: "Peluang siswa terlambat 0,08. Jika ada 200 hari sekolah, frekuensi harapan datang tepat waktu adalah ....", o: ["168","176","184","192"], a: 3},
+    {q: "Peluang turun hujan hari ini 0,3. Selama 50 hari, frekuensi harapan hari tidak hujan adalah ....", o: ["25","30","35","40"], a: 2},
+    {q: "Peluang mesin menghasilkan barang cacat 0,05. Jika mesin menghasilkan 400 barang, frekuensi harapan barang baik adalah ....", o: ["360","370","380","390"], a: 2},
+    {q: "Peluang pemain basket masuk bola 0,8. Jika melakukan 60 tembakan, frekuensi harapan tembakan gagal adalah ....", o: ["8","10","12","15"], a: 2},
+    {q: "Peluang angka genap saat dadu dilempar 1/2. Jika dilempar 120 kali, frekuensi harapan muncul genap adalah ....", o: ["40","50","60","70"], a: 2},
+    {q: "Peluang pelanggan membeli minuman 0,35. Jika ada 200 pelanggan, frekuensi harapan pelanggan membeli minuman adalah ....", o: ["50","60","70","80"], a: 2},
+    {q: "Peluang printer rusak 0,02. Jika digunakan 500 kali, frekuensi harapan printer tidak rusak adalah ....", o: ["470","480","490","495"], a: 2},
+    {q: "Peluang bus tepat waktu 0,85. Dalam 200 perjalanan, frekuensi harapan bus terlambat adalah ....", o: ["20","25","30","35"], a: 2},
+    {q: "Sebuah dadu dilempar 150 kali. Frekuensi harapan muncul mata dadu 6 adalah ....", o: ["15","20","25","30"], a: 2},
+    {q: "Sebuah koin dilempar 90 kali. Frekuensi harapan muncul gambar adalah ....", o: ["30","40","45","50"], a: 2},
+    {q: "Sebuah dadu dilempar 60 kali. Frekuensi harapan muncul bilangan prima adalah ....", o: ["20","25","30","35"], a: 2},
+    {q: "Dua buah koin dilempar bersama-sama sebanyak 120 kali. Frekuensi harapan muncul satu gambar dan satu angka adalah ....", o: ["30","40","60","80"], a: 2},
+    {q: "Sebuah spinner memiliki 5 warna sama besar. Spinner diputar 200 kali. Frekuensi harapan muncul warna biru adalah ....", o: ["20","30","40","50"], a: 2},
+    {q: "Sebuah kartu bernomor 1 sampai 10 diambil acak sebanyak 80 kali. Frekuensi harapan terambil bilangan genap adalah ....", o: ["20","30","40","50"], a: 2},
+    {q: "Peluang seorang siswa lulus ujian adalah 0,9. Jika ada 300 siswa, frekuensi harapan siswa tidak lulus adalah ....", o: ["10","20","30","40"], a: 2},
+    {q: "Peluang hujan turun hari ini 0,4. Selama 100 hari, frekuensi harapan hujan tidak turun adalah ....", o: ["40","50","60","70"], a: 2},
+    {q: "Peluang lampu menyala adalah 0,95. Jika diuji 200 kali, frekuensi harapan lampu mati adalah ....", o: ["5","10","15","20"], a: 1},
+    {q: "Sebuah dadu dilempar 180 kali. Frekuensi harapan muncul bilangan kurang dari 5 adalah ....", o: ["90","100","120","150"], a: 2},
+    {q: "Dua buah dadu dilempar bersama-sama sebanyak 72 kali. Frekuensi harapan jumlah mata dadu 12 adalah ....", o: ["1","2","4","6"], a: 1},
+    {q: "Sebuah koin dilempar 160 kali. Frekuensi harapan muncul angka adalah ....", o: ["60","70","80","90"], a: 2},
+    {q: "Sebuah kartu bernomor 1 sampai 20 diambil acak sebanyak 60 kali. Frekuensi harapan terambil kelipatan 4 adalah ....", o: ["10","15","20","25"], a: 1},
+    {q: "Peluang pemain menang adalah 0,6. Jika bermain 50 kali, frekuensi harapan kalah adalah ....", o: ["10","15","20","25"], a: 2},
+    {q: "Peluang siswa hadir tepat waktu adalah 0,88. Dalam 250 hari sekolah, frekuensi harapan terlambat adalah ....", o: ["20","25","30","35"], a: 2},
+    {q: "Peluang mesin rusak adalah 0,04. Jika digunakan 1000 kali, frekuensi harapan mesin bekerja baik adalah ....", o: ["920","940","960","980"], a: 2},
+    {q: "Sebuah spinner memiliki 8 bagian sama besar. Spinner diputar 160 kali. Frekuensi harapan muncul satu warna tertentu adalah ....", o: ["10","20","30","40"], a: 1},
+    {q: "Peluang bola merah terambil adalah 0,25. Jika percobaan dilakukan 120 kali, frekuensi harapan bola merah terambil adalah ....", o: ["20","25","30","35"], a: 2},
+    {q: "Peluang printer tidak rusak adalah 0,97. Jika digunakan 300 kali, frekuensi harapan printer rusak adalah ....", o: ["6","9","12","15"], a: 1},
+    {q: "Peluang bus terlambat adalah 0,1. Dalam 500 perjalanan, frekuensi harapan bus tepat waktu adalah ....", o: ["400","425","450","475"], a: 2},
+    {q: "Sebuah dadu dilempar 240 kali. Frekuensi harapan muncul mata dadu genap adalah ....", o: ["80","100","120","140"], a: 2},
+    {q: "Sebuah koin dilempar 300 kali. Frekuensi harapan muncul gambar adalah ....", o: ["100","125","150","175"], a: 2},
+    {q: "Peluang seorang pelanggan membeli roti adalah 0,45. Jika ada 400 pelanggan, frekuensi harapan membeli roti adalah ....", o: ["140","160","180","200"], a: 2},
+    {q: "Peluang muncul bilangan prima pada dadu adalah 1/2. Jika dilempar 200 kali, frekuensi harapan tidak muncul bilangan prima adalah ....", o: ["50","75","100","125"], a: 2},
+    {q: "Sebuah kartu bernomor 1 sampai 16 diambil acak sebanyak 64 kali. Frekuensi harapan terambil bilangan kuadrat sempurna adalah ....", o: ["8","12","16","20"], a: 2},
+    {q: "Sebuah spinner dengan 4 warna sama besar diputar 240 kali. Frekuensi harapan muncul warna hijau adalah ....", o: ["40","50","60","70"], a: 2},
+    {q: "Peluang seorang siswa membawa buku adalah 0,93. Jika ada 100 siswa, frekuensi harapan tidak membawa buku adalah ....", o: ["3","5","7","9"], a: 2},
+    {q: "Sebuah dadu dilempar 300 kali. Frekuensi harapan muncul angka kurang dari 3 adalah ....", o: ["50","75","100","125"], a: 2},
+    {q: "Dua buah koin dilempar bersama-sama sebanyak 200 kali. Frekuensi harapan muncul minimal satu gambar adalah ....", o: ["100","120","150","175"], a: 2},
+    {q: "Peluang sebuah lampu mati adalah 0,12. Jika diuji 250 kali, frekuensi harapan lampu menyala adalah ....", o: ["190","200","210","220"], a: 3},
+    {q: "Peluang pemain basket gagal memasukkan bola adalah 0,35. Jika melakukan 80 tembakan, frekuensi harapan bola masuk adalah ....", o: ["42","48","52","56"], a: 2}
+]
     };
 
     const studentsData = {
@@ -271,29 +389,44 @@
 
 <!-- RECAP FINAL MODAL -->
 <div id="recap-modal" class="fixed inset-0 bg-slate-950 z-[110] hidden flex items-center justify-center p-4 overflow-y-auto">
-    <div class="w-full max-w-4xl glass rounded-[3rem] p-12 border-blue-500/40 relative">
-        <div class="absolute -top-24 left-1/2 -translate-x-1/2 text-center w-full">
-            <h2 class="game-font text-9xl text-white glow-text mb-2">MISI SELESAI</h2>
-            <p class="sci-fi-font text-blue-400 tracking-[0.5em] text-sm" id="recap-class-id">LEADERBOARD TERKALIBRASI</p>
+    <div class="w-full max-w-6xl glass rounded-[3rem] p-8 border-blue-500/40 relative">
+        <div class="text-center mb-8">
+            <h2 class="game-font text-6xl text-white glow-text mb-1">MISI SELESAI</h2>
+            <p class="sci-fi-font text-blue-400 tracking-[0.3em] text-xs" id="recap-class-id">LEADERBOARD TERKALIBRASI</p>
         </div>
 
-        <div class="mt-16 overflow-hidden">
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="text-blue-400/50 sci-fi-font text-[10px] tracking-widest border-b border-white/5">
-                        <th class="py-6 px-4">RANK</th>
-                        <th class="py-6 px-4">ASTRONAUT NAME</th>
-                        <th class="py-6 px-4 text-right">CREDITS (PTS)</th>
-                    </tr>
-                </thead>
-                <tbody id="recap-body" class="divide-y divide-white/5">
-                    <!-- Leaderboard data -->
-                </tbody>
-            </table>
+        <div class="leaderboard-container" id="leaderboard-columns">
+            <!-- Table 1 (1-16) -->
+            <div class="overflow-hidden">
+                <table class="w-full text-left compact-table">
+                    <thead>
+                        <tr class="text-blue-400/50 sci-fi-font text-[9px] tracking-widest border-b border-white/10">
+                            <th class="pb-2">RK</th>
+                            <th class="pb-2">ASTRONAUT</th>
+                            <th class="pb-2 text-right">PTS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recap-body-1"></tbody>
+                </table>
+            </div>
+            <!-- Table 2 (17-32) -->
+            <div class="overflow-hidden">
+                <table class="w-full text-left compact-table">
+                    <thead>
+                        <tr class="text-blue-400/50 sci-fi-font text-[9px] tracking-widest border-b border-white/10">
+                            <th class="pb-2">RK</th>
+                            <th class="pb-2">ASTRONAUT</th>
+                            <th class="pb-2 text-right">PTS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recap-body-2"></tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="mt-10 flex justify-center">
-            <button onclick="window.location.reload()" class="bg-white text-slate-950 px-10 py-4 rounded-2xl sci-fi-font font-black hover:bg-blue-400 transition-colors">MULAI ULANG SISTEM</button>
+        <div class="mt-8 flex justify-center gap-4">
+            <button onclick="window.location.reload()" class="bg-blue-600 text-white px-8 py-3 rounded-xl sci-fi-font text-xs font-black hover:bg-blue-400 transition-colors">MULAI ULANG</button>
+            <button onclick="document.getElementById('recap-modal').classList.add('hidden')" class="bg-white/10 text-white px-8 py-3 rounded-xl sci-fi-font text-xs hover:bg-white/20 transition-colors">KEMBALI</button>
         </div>
     </div>
 </div>
@@ -442,42 +575,76 @@
 
 
     function confirmEndSession() {
-        if(confirm("Yakin ingin mengakhiri sesi misi sekarang? Data akan dikunci dan Leaderboard akan ditampilkan.")) {
-            endSession();
+    if(confirm("Yakin ingin mengakhiri sesi misi sekarang? Data akan dikunci dan Leaderboard akan ditampilkan.")) {
+        endSession();
+    }
+}
+
+function endSession() {
+    gameState.sessionEnded = true;
+    document.getElementById('recap-class-id').innerText = `MISSION LOG: KELAS ${gameState.currentClass}`;
+    
+    const body1 = document.getElementById('recap-body-1');
+    const body2 = document.getElementById('recap-body-2');
+    body1.innerHTML = "";
+    body2.innerHTML = "";
+    
+    const sorted = Object.entries(gameState.scores).sort((a,b) => b[1] - a[1]);
+    const half = Math.ceil(sorted.length / 2);
+    
+    const firstHalf = sorted.slice(0, half);
+    const secondHalf = sorted.slice(half);
+
+    const createRow = ([name, score], idx, offset) => {
+        const actualRank = idx + 1 + offset;
+        let rankDisplay = actualRank;
+        let rankClass = "text-slate-400";
+        let rowClass = "hover:bg-white/5 transition-colors";
+        
+        if(actualRank === 1) { 
+            rankDisplay = "🥇"; 
+            rankClass = "text-xl"; 
+            rowClass = "bg-yellow-500/5"; 
         }
-    }
+        else if(actualRank === 2) { 
+            rankDisplay = "🥈"; 
+            rankClass = "text-xl"; 
+            rowClass = "bg-slate-400/5"; 
+        }
+        else if(actualRank === 3) { 
+            rankDisplay = "🥉"; 
+            rankClass = "text-xl"; 
+            rowClass = "bg-amber-700/5"; 
+        }
 
-    function endSession() {
-        gameState.sessionEnded = true;
-        const body = document.getElementById('recap-body');
-        body.innerHTML = "";
-        
-        document.getElementById('recap-class-id').innerText = `MISSION LOG: KELAS ${gameState.currentClass}`;
-        
-        // Sorting high to low
-        const sorted = Object.entries(gameState.scores).sort((a,b) => b[1] - a[1]);
-        
-        sorted.forEach(([name, score], idx) => {
-            const tr = document.createElement('tr');
-            tr.className = "hover:bg-white/5 transition-colors group";
-            
-            let rankDisplay = idx + 1;
-            let rankClass = "";
-            if(idx === 0) { rankDisplay = "🥇"; rankClass = "rank-1 text-2xl"; }
-            else if(idx === 1) { rankDisplay = "🥈"; rankClass = "rank-2 text-2xl"; }
-            else if(idx === 2) { rankDisplay = "🥉"; rankClass = "rank-3 text-2xl"; }
+        return `
+            <tr class="${rowClass}">
+                <td class="sci-fi-font font-black ${rankClass} w-10">${rankDisplay}</td>
+                <td class="font-bold text-white text-sm uppercase">${name}</td>
+                <td class="text-right font-black sci-fi-font text-blue-400 text-sm">${score}</td>
+            </tr>
+        `;
+    };
 
-            tr.innerHTML = `
-                <td class="py-6 px-4 sci-fi-font font-black ${rankClass}">${rankDisplay}</td>
-                <td class="py-6 px-4 font-bold text-white group-hover:text-blue-300 transition-colors">${name}</td>
-                <td class="py-6 px-4 text-right font-black sci-fi-font text-blue-400">${score}</td>
-            `;
-            body.appendChild(tr);
-        });
+    firstHalf.forEach((data, i) => {
+        body1.innerHTML += createRow(data, i, 0);
+    });
 
-        document.getElementById('recap-modal').classList.remove('hidden');
-    }
+    secondHalf.forEach((data, i) => {
+        body2.innerHTML += createRow(data, i, half);
+    });
 
+    // tampilkan recap
+    const recapModal = document.getElementById('recap-modal');
+    recapModal.classList.remove('hidden');
+
+    // paksa tampil
+    recapModal.style.display = "flex";
+
+    // debug
+    console.log("RECAP OPENED");
+    console.log(sorted);
+}
     function showToast(msg) {
         const toast = document.createElement('div');
         toast.className = "fixed bottom-10 left-1/2 -translate-x-1/2 bg-red-600 text-white px-8 py-4 rounded-2xl shadow-2xl z-[200] font-black sci-fi-font text-xs tracking-widest transition-all animate-bounce border border-red-400";
@@ -499,5 +666,3 @@
         }, 1200);
     }
 </script>
-</body>
-</html>
