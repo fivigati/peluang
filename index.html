@@ -3,441 +3,501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Kotak Misteri Peluang</title>
+    <title>Space Escape: Mission Probability</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Bangers&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #6366f1;
-            --secondary: #f43f5e;
-            --accent: #fbbf24;
-            --success: #10b981;
-            --bg-game: #f0f4ff;
+        body { font-family: 'Inter', sans-serif; background-color: #020617; }
+        .game-font { font-family: 'Bangers', cursive; }
+        .sci-fi-font { font-family: 'Orbitron', sans-serif; }
+        
+        @keyframes stars {
+            from { background-position: 0 0; }
+            to { background-position: -10000px 5000px; }
         }
 
-        body {
-            font-family: 'Quicksand', sans-serif;
-            background-color: var(--bg-game);
-            background-image: radial-gradient(#d1d5db 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-
-        h1, h2, .font-title {
-            font-family: 'Fredoka One', cursive;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-            gap: 12px;
-        }
-
-        .mystery-box {
-            aspect-ratio: 1;
-            background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
-            border-radius: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            color: white;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 8px 0 #312e81, 0 12px 15px rgba(0,0,0,0.1);
-            position: relative;
-            user-select: none;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .mystery-box:hover {
-            transform: translateY(-5px);
-            filter: brightness(1.1);
-        }
-
-        .mystery-box.opened {
-            background: #e2e8f0;
-            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
-            transform: none;
-            cursor: default;
-            color: #94a3b8;
-            text-shadow: none;
-        }
-
-        .name-display {
-            background: #fff;
-            border: 4px solid var(--primary);
-            border-radius: 24px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .space-bg {
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
             overflow: hidden;
             position: relative;
-            box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .rolling-text {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: #4338ca;
-            text-align: center;
-            padding: 0 1rem;
-            animation: pulse 1s infinite alternate;
+        .stars-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+            animation: stars 200s linear infinite;
+            opacity: 0.5;
+            pointer-events: none;
         }
 
-        @keyframes pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.05); }
+        @keyframes shake {
+            0%, 100% { transform: translate(0,0); }
+            10%, 30%, 50%, 70%, 90% { transform: translate(-5px, -5px) rotate(-1deg); }
+            20%, 40%, 60%, 80% { transform: translate(5px, 5px) rotate(1deg); }
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.85);
-            z-index: 50;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(8px);
+        .shaking { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
+        
+        .box-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        .box-card:hover { 
+            transform: translateY(-10px) scale(1.05); 
+            border-color: rgba(96, 165, 250, 0.5);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+        }
+        
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .modal-content {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 40px;
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        
+        .glow-text {
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
         }
 
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .option-btn {
-            width: 100%;
-            padding: 1.2rem;
-            margin: 0.5rem 0;
-            background: #f8fafc;
-            border: 3px solid #e2e8f0;
-            border-radius: 20px;
-            font-weight: 700;
-            transition: all 0.2s;
-            text-align: left;
-            display: flex;
-            align-items: center;
-        }
-
-        .option-btn:hover {
-            background: #eef2ff;
-            border-color: #6366f1;
-            transform: translateX(8px);
-        }
+        .rank-1 { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+        .rank-2 { color: #e2e8f0; text-shadow: 0 0 10px rgba(226, 232, 240, 0.5); }
+        .rank-3 { color: #d97706; text-shadow: 0 0 10px rgba(217, 119, 6, 0.5); }
     </style>
 </head>
-<body class="p-4 md:p-8 min-h-screen">
+<body class="text-slate-100 min-h-screen overflow-hidden space-bg">
+<div class="stars-overlay"></div>
 
-    <div class="max-w-7xl mx-auto">
-        <header class="text-center mb-10">
-            <h1 class="text-5xl md:text-6xl text-indigo-700 mb-2 drop-shadow-lg">KOTAK MISTERI PELUANG</h1>
-            <div class="inline-block bg-indigo-100 px-6 py-2 rounded-full">
-                <p class="text-indigo-600 font-bold tracking-widest uppercase text-sm">Uji Keberuntungan & Logika Matematikamu!</p>
+<script>
+    const questionBank = {
+        box1: [
+            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian muncul jumlah mata dadu 9 adalah ....", o: ["3","4","5","6"], a: 1},
+            {q: "Sebuah koin dilempar empat kali. Banyak kejadian muncul tepat tiga gambar adalah ....", o: ["2","3","4","5"], a: 2},
+            {q: "Sebuah kartu bernomor 1 sampai 20 diambil satu kartu. Banyak kejadian terambil bilangan prima adalah ....", o: ["6","7","8","9"], a: 2},
+            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian muncul pasangan bilangan genap adalah ....", o: ["6","8","9","12"], a: 2},
+            {q: "Sebuah bilangan dipilih dari 1 sampai 40. Banyak kejadian terambil kelipatan 5 adalah ....", o: ["6","7","8","9"], a: 2},
+            {q: "Tiga buah koin dilempar bersama-sama. Banyak kejadian muncul paling sedikit satu gambar adalah ....", o: ["6","7","8","9"], a: 1},
+            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian jumlah mata dadu lebih dari 9 adalah ....", o: ["5","6","7","8"], a: 1},
+            {q: "Sebuah huruf dipilih dari kata “SEKOLAH”. Banyak kejadian terambil huruf vokal adalah ....", o: ["2","3","4","5"], a: 1},
+            {q: "Sebuah spinner memiliki warna merah, biru, hijau, kuning, ungu, dan putih. Banyak kejadian muncul warna selain merah adalah ....", o: ["3","4","5","6"], a: 2},
+            {q: "Sebuah dadu dilempar dua kali. Banyak kejadian jumlah kedua mata dadu merupakan bilangan genap adalah ....", o: ["16","18","20","22"], a: 1},
+            {q: "Dua buah koin dilempar bersama-sama. Banyak kejadian komplemen muncul dua angka adalah ....", o: ["1","2","3","4"], a: 2},
+            {q: "Sebuah kartu bernomor 1 sampai 30 diambil satu kartu. Banyak kejadian komplemen terambil bilangan ganjil adalah ....", o: ["14","15","16","17"], a: 1},
+            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian komplemen jumlah mata dadu 8 adalah ....", o: ["30","31","32","33"], a: 1},
+            {q: "Sebuah bilangan dipilih dari 1 sampai 50. Banyak kejadian terambil bilangan kelipatan 4 tetapi bukan kelipatan 2 adalah ....", o: ["0","1","2","3"], a: 0},
+            {q: "Tiga buah koin dilempar bersama-sama. Banyak kejadian muncul tepat dua gambar adalah ....", o: ["2","3","4","5"], a: 1},
+            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian hasil kali kedua mata dadu ganjil adalah ....", o: ["6","8","9","12"], a: 2},
+            {q: "Sebuah kartu bernomor 1 sampai 30 diambil satu kartu. Banyak kejadian terambil faktor dari 18 adalah ....", o: ["4","5","6","7"], a: 2},
+            {q: "Sebuah huruf dipilih dari kata “MATEMATIKA”. Banyak kejadian komplemen terambil huruf vokal adalah ....", o: ["3","4","5","6"], a: 1},
+            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian jumlah mata dadu merupakan kelipatan 4 adalah ....", o: ["8","9","10","11"], a: 1},
+            {q: "Sebuah bilangan dipilih dari 1 sampai 30. Banyak kejadian terambil bilangan prima genap adalah ....", o: ["1","2","3","4"], a: 0}
+        ],
+        box2: [
+            {q: "Sebuah dadu dilempar satu kali. Peluang muncul mata dadu ganjil adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 2},
+            {q: "Sebuah koin dilempar dua kali. Peluang muncul dua gambar adalah ....", o: ["1/4","1/3","1/2","3/4"], a: 0},
+            {q: "Sebuah kartu bernomor 1 sampai 12 diambil satu kartu. Peluang terambil bilangan prima adalah ....", o: ["1/6","1/3","5/12","1/2"], a: 2},
+            {q: "Dua buah dadu dilempar bersama-sama. Peluang jumlah mata dadu 8 adalah ....", o: ["1/12","5/36","1/6","7/36"], a: 1},
+            {q: "Sebuah spinner memiliki 5 warna sama besar. Peluang muncul warna biru adalah ....", o: ["1/3","1/4","1/5","1/6"], a: 2},
+            {q: "Sebuah bilangan dipilih dari 1 sampai 20. Peluang terambil kelipatan 4 adalah ....", o: ["1/5","1/4","3/10","2/5"], a: 1},
+            {q: "Tiga buah koin dilempar bersama-sama. Peluang muncul semua angka adalah ....", o: ["1/8","1/4","3/8","1/2"], a: 0},
+            {q: "Sebuah dadu dilempar satu kali. Peluang muncul mata dadu kurang dari 3 adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 1},
+            {q: "Dua buah dadu dilempar bersama-sama. Peluang muncul pasangan bilangan genap adalah ....", o: ["1/6","1/4","1/3","1/2"], a: 1},
+            {q: "Sebuah kartu bernomor 1 sampai 15 diambil satu kartu. Peluang terambil bilangan ganjil adalah ....", o: ["6/15","7/15","8/15","9/15"], a: 2},
+            {q: "Peluang seorang siswa hadir tepat waktu adalah 0,85. Peluang siswa terlambat adalah ....", o: ["0,05","0,10","0,15","0,20"], a: 2},
+            {q: "Peluang sebuah mesin bekerja baik adalah 0,92. Peluang mesin rusak adalah ....", o: ["0,02","0,04","0,08","0,12"], a: 2},
+            {q: "Peluang muncul bilangan prima pada pelemparan dadu adalah 1/2. Peluang tidak muncul bilangan prima adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 2},
+            {q: "Dalam 80 kali pelemparan koin, muncul gambar sebanyak 32 kali. Peluang empiris muncul gambar adalah ....", o: ["2/5","3/5","1/2","4/5"], a: 0},
+            {q: "Sebuah dadu dilempar 50 kali dan muncul mata dadu 2 sebanyak 10 kali. Peluang empiris muncul mata dadu 2 adalah ....", o: ["1/10","1/5","1/4","1/2"], a: 1}
+        ],
+        box3: [
+            {q: "Sebuah dadu dilempar 120 kali. Frekuensi harapan muncul mata dadu 4 adalah ....", o: ["10","15","20","25"], a: 2},
+            {q: "Sebuah koin dilempar 60 kali. Frekuensi harapan muncul angka adalah ....", o: ["20","25","30","35"], a: 2},
+            {q: "Sebuah dadu dilempar 84 kali. Frekuensi harapan muncul bilangan ganjil adalah ....", o: ["28","36","42","48"], a: 2},
+            {q: "Dua buah koin dilempar bersama-sama sebanyak 100 kali. Frekuensi harapan muncul dua gambar adalah ....", o: ["20","25","30","35"], a: 1},
+            {q: "Sebuah kartu bernomor 1 sampai 12 diambil acak sebanyak 48 kali. Frekuensi harapan terambil bilangan prima adalah ....", o: ["12","16","20","24"], a: 2},
+            {q: "Sebuah spinner memiliki 6 warna sama besar. Spinner diputar 180 kali. Frekuensi harapan muncul warna merah adalah ....", o: ["20","30","40","50"], a: 1},
+            {q: "Sebuah dadu dilempar 96 kali. Frekuensi harapan muncul bilangan kurang dari 4 adalah ....", o: ["24","36","48","60"], a: 2},
+            {q: "Dua buah dadu dilempar bersama-sama sebanyak 144 kali. Frekuensi harapan jumlah mata dadu 7 adalah ....", o: ["12","18","24","30"], a: 2},
+            {q: "Sebuah koin dilempar 200 kali. Frekuensi harapan muncul gambar adalah ....", o: ["50","75","100","125"], a: 2},
+            {q: "Peluang muncul mata dadu prima adalah 1/2. Jika sebuah dadu dilempar 80 kali, frekuensi harapan muncul mata dadu prima adalah ....", o: ["20","30","40","50"], a: 2},
+            {q: "Peluang pemain sepak bola berhasil mencetak gol penalti 0,75. Jika melakukan 40 tendangan, frekuensi harapan gagal adalah ....", o: ["5","10","15","20"], a: 1},
+            {q: "Peluang siswa terlambat 0,08. Jika ada 200 hari sekolah, frekuensi harapan datang tepat waktu adalah ....", o: ["168","176","184","192"], a: 3},
+            {q: "Peluang turun hujan hari ini 0,3. Selama 50 hari, frekuensi harapan hari tidak hujan adalah ....", o: ["25","30","35","40"], a: 2},
+            {q: "Peluang mesin menghasilkan barang cacat 0,05. Jika mesin menghasilkan 400 barang, frekuensi harapan barang baik adalah ....", o: ["360","370","380","390"], a: 2}
+        ]
+    };
+
+    const studentsData = {
+        "8A": ["ABID AQILA WIRATAMA", "ACHMAD MIFTAHUL HUDA", "AHMAD FARIS FADHILAH", "AHMAD ZAIDAN ALFIKRI", "ALISHA ZAHRA OCTAVIANA", "AMRIZAL RAHMAT MAULIDANI", "ANDIK FIRMANSYAH", "ANGGELINA OKTAVIA", "ANNISA NUR RACHMA AZZARAH", "ASYIFA FEBRIANA PUTRI", "AZ ZAHRAH DIVA SYAHPUTRI", "AZMI RIDWAN ATHALLAH ARIYANTO", "BAGAS DEWA BUANA", "BILQIS MAHA FILWA", "FARIS RIZQY OKTAFIANSYAH", "FATIMA'TUS ZAHRO", "FATUR ARRASYID", "FINNA AMELIA FEDORA", "GENDIS ELVAIRA DWITIRTO RAHMATIE", "SAMOCHAMMAD FATHIR AQEELAH ROVIANSYAH", "MUHAMMAD ZAKY BRAHMANTYO BAGASKARA", "NAFISAH AQILAH ARROFIFAH", "NAJWA AZZAHRA SALSABILLA", "RAHMAD CAHAYA", "RANIA AYU SEPTIANA", "REZA ZAIN", "SATRIA BINTANG SYAHADAH", "SOFIA RIZKY ANARA", "TANAYA GALUH NIRMALA SARI", "WINDI NUR AZIZA WIBOWO", "YONGKI MAULANA VALENCIA"],
+        "8B": ["ACH FAUZAN ABDILLAH", "AL-KHADAFI AQILAH AR-ZAKIAN", "ANINDYA RASYIDTA DEWA DANISWARA", "ASTAGINA DEWI MAULIDYA", "AURA KARISSA PUTRI", "BINTANG MAULANA RAHMAD WIJAYA", "DAFFA RIZKI SAPUTRA", "DEWI BAYU PUTRI PITALOKA", "DISMA PUTRI OKTAVIA", "ELIRICA ALIYAH", "FAUZIA AULIA PUTRI", "GENRE ANEVAY RADISTA", "HANI FADHILAH", "LOVLY DIANAH KAMILAH", "MUHAMMAD GILANG RAMADHAN", "MUHAMMAD MISBAHUS SURUR", "NADHIF AZKA KIRANSYAH", "NADRASYAH PARSA KALENA", "ERA PUTRI ARIA WATIN", "OVAL DWI PUTRA HARIANTO", "RAMA RAFAEL SAPUTRA", "REIHAN RIZQI RAMADHAN", "REVAN ARIA PUTRA", "SAKTI PRASMUDA WARDANI AL-AMIN", "SITI HUDAIFAH", "TIRTA JAVIER PRAWIRA", "ZAHRA FIRA HARIANTO", "ZIVA NUR MAULIDYA", "SILVA PUTRI ANDRIANA"]
+    };
+
+    let gameState = {
+        currentClass: null,
+        activeStudent: null,
+        scores: {},
+        usedQuestions: { box1: [], box2: [], box3: [] },
+        currentQuestion: null,
+        currentBox: null,
+        sessionEnded: false
+    };
+
+    const BOX_RULES = {
+        box1: { win: 10, lose: -3 },
+        box2: { win: 15, lose: -2 },
+        box3: { win: 15, lose: -2 }
+    };
+
+</script>
+
+<!-- START SCREEN -->
+<div id="setup-screen" class="fixed inset-0 z-50 flex items-center justify-center p-6">
+    <div class="glass p-12 rounded-[2rem] shadow-2xl text-center max-w-lg w-full border-blue-500/30">
+        <h1 class="game-font text-6xl text-blue-400 mb-2 tracking-tighter glow-text">SPACE ESCAPE</h1>
+        <p class="sci-fi-font text-xs text-blue-200/60 mb-10 tracking-[0.3em]">MISSION CONTROL SYSTEM</p>
+        <div class="grid grid-cols-1 gap-4">
+            <button onclick="initGame('8A')" class="group relative bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/50 text-blue-400 font-bold py-5 rounded-2xl transition-all sci-fi-font overflow-hidden">
+                <span class="relative z-10">INITIATE MISSION: 8A</span>
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            </button>
+            <button onclick="initGame('8B')" class="group relative bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/50 text-purple-400 font-bold py-5 rounded-2xl transition-all sci-fi-font overflow-hidden">
+                <span class="relative z-10">INITIATE MISSION: 8B</span>
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN INTERFACE -->
+<div id="game-container" class="hidden h-screen flex relative z-10">
+    <!-- Sidebar -->
+    <aside class="w-80 glass border-r border-white/5 flex flex-col">
+        <div class="p-8 border-b border-white/5 bg-white/5">
+            <h2 class="sci-fi-font text-xl text-blue-400 glow-text" id="class-title">---</h2>
+            <div class="flex items-center gap-2 mt-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Astronaut Status</p>
             </div>
-        </header>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2" id="student-list">
+            <!-- Students -->
+        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="p-6 border-t border-white/5 bg-slate-900/50">
+            <button onclick="confirmEndSession()" class="w-full bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white py-4 rounded-xl sci-fi-font text-xs transition-all border border-red-500/30 flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                AKHIRI SESI MISI
+            </button>
+        </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="flex-1 flex flex-col items-center justify-center p-10 relative">
+        <div class="text-center mb-12">
+            <h1 class="game-font text-7xl md:text-8xl text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] mb-2">CHOOSE YOUR PORTAL</h1>
+            <p class="sci-fi-font text-blue-300/60 text-[10px] md:text-xs tracking-[0.4em] mb-10">DECRYPT PROBABILITY TO ESCAPE THE VOID</p>
             
-            <div class="lg:col-span-4 space-y-6">
-                <div class="bg-white p-8 rounded-[40px] shadow-2xl border-b-[12px] border-indigo-200">
-                    <h2 class="text-xl text-center text-indigo-500 mb-6 font-title tracking-wide">SIAPA YANG MAJU?</h2>
-                    
-                    <div id="randomizer" class="name-display mb-6">
-                        <div id="target-name" class="rolling-text font-title">SIAP MAIN?</div>
-                    </div>
+            <!-- Active Player Info moved here for better visibility -->
+            <div id="active-player-info" class="inline-block glass px-12 py-5 rounded-[2rem] border-blue-500/40 hidden animate-pulse shadow-[0_0_30px_rgba(59,130,246,0.15)]">
+                <span class="sci-fi-font text-[10px] text-blue-400 block mb-2 uppercase tracking-[0.2em]">Astronaut in Charge:</span>
+                <span id="display-active-name" class="game-font text-4xl text-white tracking-wider">---</span>
+            </div>
+        </div>
 
-                    <button id="roll-btn" class="w-full bg-rose-500 hover:bg-rose-600 text-white py-5 rounded-3xl font-bold text-2xl shadow-[0_8px_0_#be123c] transition-all active:translate-y-1 active:shadow-none mb-6 flex items-center justify-center gap-3">
-                        <span>🎯</span> ACAK NAMA!
-                    </button>
-
-                    <div class="pt-6 border-t-2 border-dashed border-gray-100">
-                        <div class="flex justify-between items-center bg-indigo-50 p-6 rounded-[30px]">
-                            <div class="text-left">
-                                <p class="text-xs font-bold text-indigo-400 uppercase">Skor Tim Saat Ini</p>
-                                <span id="score-val" class="text-5xl text-indigo-600 font-title">0</span>
-                            </div>
-                            <div class="text-5xl">🏆</div>
-                        </div>
-                    </div>
+        <div class="flex flex-wrap justify-center gap-8">
+            <!-- Box 1 -->
+            <div id="box1" onclick="handleBoxClick('box1')" class="box-card w-64 h-80 glass rounded-[2.5rem] flex flex-col items-center justify-center relative overflow-hidden group">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
+                <div class="text-blue-500 mb-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                 </div>
-
-                <div class="bg-gradient-to-br from-indigo-600 to-blue-700 p-8 rounded-[40px] text-white shadow-xl">
-                    <h3 class="font-bold text-xl mb-4 flex items-center gap-3 font-title"><span>📝</span> PETUNJUK</h3>
-                    <ul class="text-sm space-y-3 opacity-95 font-medium leading-relaxed">
-                        <li class="flex gap-2"><span>1.</span> Acak nama untuk memilih siapa yang akan menjawab.</li>
-                        <li class="flex gap-2"><span>2.</span> Klik kotak misteri mana saja.</li>
-                        <li class="flex gap-2"><span>3.</span> Jika <b>Salah</b> atau <b>Lewat</b>, kotak tutup lagi & soal akan diganti baru!</li>
-                    </ul>
-                </div>
+                <span class="game-font text-8xl text-white z-10 group-hover:scale-110 transition-transform">1</span>
+                <span class="sci-fi-font text-[10px] text-blue-400 mt-4 tracking-widest">CONCEPT VOID</span>
+                <div class="mt-4 px-3 py-1 bg-blue-500/20 rounded-full text-[10px] font-black text-blue-300">10 POINTS</div>
             </div>
 
-            <div class="lg:col-span-8 bg-white p-8 rounded-[40px] shadow-2xl border-b-[12px] border-gray-100">
-                <div id="grid" class="grid-container">
-                    <!-- Kotak akan di-render di sini -->
+            <!-- Box 2 -->
+            <div id="box2" onclick="handleBoxClick('box2')" class="box-card w-64 h-80 glass rounded-[2.5rem] flex flex-col items-center justify-center relative overflow-hidden group">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl"></div>
+                <div class="text-purple-500 mb-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 </div>
+                <span class="game-font text-8xl text-white z-10 group-hover:scale-110 transition-transform">2</span>
+                <span class="sci-fi-font text-[10px] text-purple-400 mt-4 tracking-widest">CHANCE NEBULA</span>
+                <div class="mt-4 px-3 py-1 bg-purple-500/20 rounded-full text-[10px] font-black text-purple-300">15 POINTS</div>
+            </div>
+
+            <!-- Box 3 -->
+            <div id="box3" onclick="handleBoxClick('box3')" class="box-card w-64 h-80 glass rounded-[2.5rem] flex flex-col items-center justify-center relative overflow-hidden group">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl"></div>
+                <div class="text-amber-500 mb-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                </div>
+                <span class="game-font text-8xl text-white z-10 group-hover:scale-110 transition-transform">3</span>
+                <span class="sci-fi-font text-[10px] text-amber-400 mt-4 tracking-widest">EXPECTED GALAXY</span>
+                <div class="mt-4 px-3 py-1 bg-amber-500/20 rounded-full text-[10px] font-black text-amber-300">15 POINTS</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Question Modal -->
+<div id="question-modal" class="fixed inset-0 bg-slate-950/80 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-md">
+    <div class="glass w-full max-w-2xl rounded-[2.5rem] shadow-[0_0_50px_rgba(59,130,246,0.3)] overflow-hidden transform transition-all scale-95 opacity-0 duration-300" id="modal-content">
+        <div id="modal-header" class="p-8 text-white border-b border-white/10 flex justify-between items-center">
+            <div>
+                <h3 class="sci-fi-font tracking-widest text-[10px] text-blue-400 mb-1" id="modal-topic">DECRYPTING DATA...</h3>
+                <p class="game-font text-3xl">MISI AKTIF</p>
+            </div>
+            <span id="point-tag" class="bg-blue-500/20 border border-blue-500/30 px-6 py-2 rounded-full text-xs sci-fi-font text-blue-300">10 POINTS</span>
+        </div>
+        <div class="p-10">
+            <p id="question-text" class="text-2xl text-white font-bold mb-10 leading-relaxed">
+                ---
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="options-container">
+                <!-- Options -->
             </div>
         </div>
     </div>
+</div>
 
-    <div id="modal" class="modal">
-        <div id="modal-body" class="modal-content">
-            <!-- Konten dinamis (Soal, Bom, Bonus) -->
+<!-- RECAP FINAL MODAL -->
+<div id="recap-modal" class="fixed inset-0 bg-slate-950 z-[110] hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-4xl glass rounded-[3rem] p-12 border-blue-500/40 relative">
+        <div class="absolute -top-24 left-1/2 -translate-x-1/2 text-center w-full">
+            <h2 class="game-font text-9xl text-white glow-text mb-2">MISI SELESAI</h2>
+            <p class="sci-fi-font text-blue-400 tracking-[0.5em] text-sm" id="recap-class-id">LEADERBOARD TERKALIBRASI</p>
+        </div>
+
+        <div class="mt-16 overflow-hidden">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="text-blue-400/50 sci-fi-font text-[10px] tracking-widest border-b border-white/5">
+                        <th class="py-6 px-4">RANK</th>
+                        <th class="py-6 px-4">ASTRONAUT NAME</th>
+                        <th class="py-6 px-4 text-right">CREDITS (PTS)</th>
+                    </tr>
+                </thead>
+                <tbody id="recap-body" class="divide-y divide-white/5">
+                    <!-- Leaderboard data -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-10 flex justify-center">
+            <button onclick="window.location.reload()" class="bg-white text-slate-950 px-10 py-4 rounded-2xl sci-fi-font font-black hover:bg-blue-400 transition-colors">MULAI ULANG SISTEM</button>
         </div>
     </div>
+</div>
 
-    <script>
-        const students = [
-            "ACH FAUZAN ABDILLAH", "AL-KHADAFI AQILAH AR-ZAKIAN", "ANINDYA RASYIDTA DEWA DANISWARA", 
-            "ASTAGINA DEWI MAULIDYA", "AURA KARISSA PUTRI", "BINTANG MAULANA RAHMAD WIJAYA", 
-            "DAFFA RIZKI SAPUTRA", "DEWI BAYU PUTRI PITALOKA", "DISMA PUTRI OKTAVIA", 
-            "ELIRICA ALIYAH", "FAUZIA AULIA PUTRI", "GENRE ANEVAY RADISTA", 
-            "HANI FADHILAH", "LOVLY DIANAH KAMILAH", "MUHAMMAD GILANG RAMADHAN", 
-            "MUHAMMAD MISBAHUS SURUR", "NADHIF AZKA KIRANSYAH", "NADRASYAH PARSA KALENA", 
-            "ERA PUTRI ARIA WATIN", "OVAL DWI PUTRA HARIANTO", "RAMA RAFAEL SAPUTRA", 
-            "REIHAN RIZQI RAMADHAN", "REVAN ARIA PUTRA", "SAKTI PRASMUDA WARDANI AL-AMIN", 
-            "SITI HUDAIFAH", "TIRTA JAVIER PRAWIRA", "ZAHRA FIRA HARIANTO", 
-            "ZIVA NUR MAULIDYA", "SILVA PUTRI ANDRIANA"
-        ];
+<script>
+    
+    function initGame(className) {
+        gameState.currentClass = className;
+        document.getElementById('setup-screen').classList.add('hidden');
+        document.getElementById('game-container').classList.remove('hidden');
+        document.getElementById('class-title').innerText = "MISSION: " + className;
 
-        const bankSoal = [
-            // Bagian 1: Ruang Sampel & Kejadian
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian muncul jumlah mata dadu 8 adalah ....", o: ["3","4","5","6"], a: 2},
-            {q: "Sebuah koin dilempar tiga kali. Banyak kejadian muncul tepat dua gambar adalah ....", o: ["2","3","4","5"], a: 1},
-            {q: "Sebuah kartu bernomor 1 sampai 15 diambil satu kartu. Banyak kejadian terambil bilangan prima adalah ....", o: ["5","6","7","8"], a: 1},
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian muncul pasangan bilangan ganjil adalah ....", o: ["6","8","9","12"], a: 2},
-            {q: "Sebuah bilangan dipilih dari 1 sampai 30. Banyak kejadian terambil kelipatan 4 adalah ....", o: ["6","7","8","9"], a: 1},
-            {q: "Tiga buah koin dilempar bersama-sama. Banyak kejadian muncul paling sedikit satu angka adalah ....", o: ["6","7","8","9"], a: 1},
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian jumlah mata dadu kurang dari 6 adalah ....", o: ["8","9","10","11"], a: 2},
-            {q: "Sebuah huruf dipilih dari kata “MATEMATIKA”. Banyak kejadian terambil huruf vokal adalah ....", o: ["4","5","6","7"], a: 1},
-            {q: "Sebuah spinner memiliki warna merah, biru, hijau, kuning, dan ungu. Banyak kejadian muncul warna selain hijau adalah ....", o: ["2","3","4","5"], a: 2},
-            {q: "Sebuah dadu dilempar dua kali. Banyak kejadian jumlah kedua mata dadu merupakan bilangan prima adalah ....", o: ["12","14","15","16"], a: 2},
-            {q: "Dua buah koin dilempar bersama-sama. Banyak kejadian komplemen muncul dua gambar adalah ....", o: ["1","2","3","4"], a: 2},
-            {q: "Sebuah kartu bernomor 1 sampai 20 diambil satu kartu. Banyak kejadian komplemen terambil bilangan genap adalah ....", o: ["8","9","10","11"], a: 2},
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian komplemen jumlah mata dadu 7 adalah ....", o: ["28","29","30","31"], a: 2},
-            {q: "Sebuah bilangan dipilih dari 1 sampai 40. Banyak kejadian terambil bilangan kelipatan 3 tetapi bukan kelipatan 2 adalah ....", o: ["6","7","8","9"], a: 1},
-            {q: "Tiga buah koin dilempar bersama-sama. Banyak kejadian muncul tepat satu gambar adalah ....", o: ["2","3","4","5"], a: 1},
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian hasil kali kedua mata dadu genap adalah ....", o: ["18","24","27","30"], a: 2},
-            {q: "Sebuah kartu bernomor 1 sampai 25 diambil satu kartu. Banyak kejadian terambil faktor dari 24 adalah ....", o: ["6","7","8","9"], a: 2},
-            {q: "Sebuah huruf dipilih dari kata “INDONESIA”. Banyak kejadian komplemen terambil huruf vokal adalah ....", o: ["3","4","5","6"], a: 1},
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian jumlah mata dadu merupakan kelipatan 3 adalah ....", o: ["10","11","12","13"], a: 2},
-            {q: "Sebuah bilangan dipilih dari 1 sampai 50. Banyak kejadian terambil bilangan prima ganjil adalah ....", o: ["13","14","15","16"], a: 1},
-            {q: "Dua buah dadu dilempar bersama-sama. Banyak ruang sampel yang mungkin adalah ....", o: ["12","24","36","42"], a: 2},
-            {q: "Sebuah koin dilempar tiga kali. Banyak ruang sampel yang mungkin adalah ....", o: ["6","8","10","12"], a: 1},
-            {q: "Sebuah spinner memiliki 4 warna dan sebuah dadu dilempar bersama-sama. Banyak ruang sampel yang mungkin adalah ....", o: ["10","18","24","30"], a: 2},
-            {q: "Dua kartu diambil berturut-turut dari kartu bernomor 1 sampai 5 tanpa pengembalian. Banyak ruang sampel yang mungkin adalah ....", o: ["10","15","20","25"], a: 2},
-            {q: "Sebuah dadu dilempar dua kali. Banyak ruang sampel yang mungkin adalah ....", o: ["12","24","30","36"], a: 3},
+        // Reset scores
+        studentsData[className].forEach(name => {
+            gameState.scores[name] = 0;
+        });
 
-            // Bagian 2: Peluang Teoretik
-            {q: "Sebuah dadu dilempar satu kali. Peluang muncul mata dadu genap adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 2},
-            {q: "Sebuah koin dilempar satu kali. Peluang muncul gambar adalah ....", o: ["1/4","1/3","1/2","1"], a: 2},
-            {q: "Sebuah dadu dilempar satu kali. Peluang muncul bilangan prima adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 2},
-            {q: "Dua buah koin dilempar bersama-sama. Peluang muncul dua angka adalah ....", o: ["1/4","1/3","1/2","3/4"], a: 0},
-            {q: "Sebuah kartu bernomor 1 sampai 10 diambil satu kartu. Peluang terambil bilangan ganjil adalah ....", o: ["1/5","2/5","1/2","3/5"], a: 2},
-            {q: "Sebuah dadu dilempar satu kali. Peluang muncul mata dadu lebih dari 4 adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 1},
-            {q: "Sebuah spinner memiliki warna merah, biru, hijau, dan kuning. Peluang muncul warna merah adalah ....", o: ["1/2","1/3","1/4","1/5"], a: 2},
-            {q: "Dua buah dadu dilempar bersama-sama. Peluang jumlah mata dadu 7 adalah ....", o: ["1/12","1/9","1/6","1/3"], a: 2},
-            {q: "Sebuah huruf dipilih dari kata “MATEMATIKA”. Peluang terambil huruf vokal adalah ....", o: ["2/5","1/2","3/5","4/5"], a: 0},
-            {q: "Sebuah bilangan dipilih dari 1 sampai 20. Peluang terambil kelipatan 5 adalah ....", o: ["1/10","1/5","1/4","1/2"], a: 1},
-            {q: "Tiga buah koin dilempar bersama-sama. Peluang muncul tepat satu gambar adalah ....", o: ["1/8","1/4","3/8","1/2"], a: 2},
-            {q: "Dua buah dadu dilempar bersama-sama. Peluang muncul pasangan bilangan sama adalah ....", o: ["1/12","1/9","1/6","1/3"], a: 2},
-            {q: "Sebuah kartu bernomor 1 sampai 15 diambil satu kartu. Peluang terambil bilangan prima adalah ....", o: ["2/15","4/15","6/15","8/15"], a: 2},
-            {q: "Sebuah dadu dilempar dua kali. Peluang jumlah kedua mata dadu 8 adalah ....", o: ["1/18","5/36","1/6","7/36"], a: 1},
-            {q: "Sebuah bola diambil dari kotak berisi 5 bola merah dan 3 bola biru. Peluang terambil bola biru adalah ....", o: ["1/8","3/8","5/8","3/5"], a: 1},
+        renderStudentList();
+    }
 
-            // Bagian 3: Komplemen & Peluang Empiris
-            {q: "Peluang seorang siswa lulus ujian adalah 0,8. Peluang siswa tidak lulus adalah ....", o: ["0,1","0,2","0,3","0,4"], a: 1},
-            {q: "Peluang turun hujan hari ini adalah 0,35. Peluang tidak turun hujan adalah ....", o: ["0,45","0,55","0,65","0,75"], a: 2},
-            {q: "Peluang sebuah lampu menyala adalah 3/5. Peluang lampu tidak menyala adalah ....", o: ["1/5","2/5","3/5","4/5"], a: 1},
-            {q: "Peluang muncul angka genap saat sebuah dadu dilempar adalah 1/2. Peluang tidak muncul angka genap adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 2},
-            {q: "Peluang seorang pemain menang adalah 0,72. Peluang pemain kalah adalah ....", o: ["0,18","0,28","0,38","0,48"], a: 1},
-            {q: "Peluang terambil bola merah dari sebuah kotak adalah 7/10. Peluang tidak terambil bola merah adalah ....", o: ["1/10","2/10","3/10","4/10"], a: 2},
-            {q: "Peluang sebuah tim memenangkan pertandingan adalah 4/9. Peluang tim tidak menang adalah ....", o: ["4/9","5/9","6/9","7/9"], a: 1},
-            {q: "Peluang seorang siswa hadir tepat waktu adalah 0,92. Peluang siswa terlambat adalah ....", o: ["0,02","0,04","0,08","0,12"], a: 2},
-            {q: "Peluang muncul bilangan prima saat sebuah dadu dilempar adalah 1/2. Peluang tidak muncul bilangan prima adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 2},
-            {q: "Peluang sebuah mesin bekerja dengan baik adalah 95%. Peluang mesin tidak bekerja dengan baik adalah ....", o: ["1%","3%","5%","10%"], a: 2},
-            {q: "Dalam sebuah percobaan melempar koin sebanyak 40 kali, muncul gambar sebanyak 18 kali. Peluang empiris muncul gambar adalah ....", o: ["9/20","11/20","18/40","22/40"], a: 0},
-            {q: "Sebuah dadu dilempar 60 kali dan muncul mata dadu 5 sebanyak 12 kali. Peluang empiris muncul mata dadu 5 adalah ....", o: ["1/10","1/5","1/4","1/3"], a: 1},
-            {q: "Dalam 50 kali percobaan, sebuah bola merah terambil 15 kali. Peluang empiris terambil bola merah adalah ....", o: ["1/5","3/10","2/5","1/2"], a: 1},
-            {q: "Sebuah spinner diputar 80 kali dan warna biru muncul 20 kali. Peluang empiris muncul warna biru adalah ....", o: ["1/5","1/4","3/10","2/5"], a: 1},
-            {q: "Sebuah koin dilempar 100 kali dan muncul angka sebanyak 56 kali. Peluang empiris muncul angka adalah ....", o: ["11/25","13/25","14/25","16/25"], a: 2},
+    function renderStudentList() {
+        const list = document.getElementById('student-list');
+        list.innerHTML = "";
+        
+        // Sorting display (not final leaderboard)
+        const sortedStudents = [...studentsData[gameState.currentClass]].sort((a, b) => gameState.scores[b] - gameState.scores[a]);
 
-            // Bagian 4: Frekuensi Harapan
-            {q: "Sebuah dadu dilempar 60 kali. Frekuensi harapan muncul mata dadu 3 adalah ....", o: ["5","10","15","20"], a: 1},
-            {q: "Sebuah koin dilempar 40 kali. Frekuensi harapan muncul gambar adalah ....", o: ["10","15","20","25"], a: 2},
-            {q: "Sebuah dadu dilempar 72 kali. Frekuensi harapan muncul bilangan genap adalah ....", o: ["24","30","36","42"], a: 2},
-            {q: "Dua buah koin dilempar bersama-sama sebanyak 80 kali. Frekuensi harapan muncul dua angka adalah ....", o: ["10","20","30","40"], a: 1},
-            {q: "Sebuah kartu bernomor 1 sampai 10 diambil acak sebanyak 50 kali. Frekuensi harapan terambil bilangan prima adalah ....", o: ["15","20","25","30"], a: 1},
-            {q: "Sebuah spinner memiliki 4 warna sama besar. Spinner diputar 120 kali. Frekuensi harapan muncul warna merah adalah ....", o: ["20","30","40","50"], a: 1},
-            {q: "Sebuah dadu dilempar 90 kali. Frekuensi harapan muncul bilangan kurang dari 3 adalah ....", o: ["15","20","30","45"], a: 2},
-            {q: "Dua buah dadu dilempar bersama-sama sebanyak 72 kali. Frekuensi harapan jumlah mata dadu 7 adalah ....", o: ["6","12","18","24"], a: 1},
-            {q: "Sebuah koin dilempar 100 kali. Frekuensi harapan muncul angka adalah ....", o: ["25","40","50","75"], a: 2},
-            {q: "Sebuah kartu bernomor 1 sampai 20 diambil acak sebanyak 80 kali. Frekuensi harapan terambil kelipatan 5 adalah ....", o: ["12","16","20","24"], a: 1},
-            {q: "Peluang muncul mata dadu prima adalah 1/2. Jika sebuah dadu dilempar 70 kali, frekuensi harapan tidak muncul mata dadu prima adalah ....", o: ["25","30","35","40"], a: 2},
-            {q: "Peluang pemain sepak bola gagal mencetak gol penalti 0,2. Jika melakukan 60 tendangan, frekuensi harapan gol adalah ....", o: ["42","45","48","50"], a: 2},
-            {q: "Peluang siswa datang terlambat 0,1. Jika ada 250 hari sekolah, frekuensi harapan datang tepat waktu adalah ....", o: ["200","210","225","240"], a: 2},
-            {q: "Peluang turun hujan hari ini 0,25. Selama 40 hari, frekuensi harapan hari tidak hujan adalah ....", o: ["20","25","30","35"], a: 2},
-            {q: "Peluang mesin hasilkan barang cacat 0,08. Jika mesin hasilkan 500 barang, frekuensi harapan barang baik adalah ....", o: ["420","440","460","480"], a: 2},
-            {q: "Peluang pemain basket masuk bola 0,7. Jika melakukan 50 tembakan, frekuensi harapan tembakan gagal adalah ....", o: ["10","15","20","25"], a: 1},
-            {q: "Peluang angka genap saat dadu dilempar 1/2. Jika dilempar 90 kali, frekuensi harapan tidak muncul genap adalah ....", o: ["30","40","45","50"], a: 2},
-            {q: "Peluang pelanggan beli roti 0,4. Jika ada 200 pelanggan, frekuensi harapan pelanggan beli roti adalah ....", o: ["40","60","80","100"], a: 2},
-            {q: "Peluang printer rusak 0,04. Jika digunakan 300 kali, frekuensi harapan printer tidak rusak adalah ....", o: ["276","282","288","294"], a: 2},
-            {q: "Peluang bus tepat waktu 0,9. Dalam 150 perjalanan, frekuensi harapan bus terlambat adalah ....", o: ["10","12","15","20"], a: 2}
-        ];
-
-        let score = 0;
-        let isRolling = false;
-        const totalBoxes = 30;
-        let boxTypes = [];
-
-        function initGame() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = '';
+        sortedStudents.forEach(name => {
+            const isActive = gameState.activeStudent === name;
+            const div = document.createElement('div');
+            div.onclick = () => {
+                if(gameState.sessionEnded) return;
+                selectStudent(name);
+            };
+            div.className = `p-5 rounded-2xl flex justify-between items-center cursor-pointer transition-all border ${isActive ? 'bg-blue-600/30 border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.3)]' : 'glass border-transparent hover:border-white/10'}`;
             
-            // Mengatur tipe kotak secara acak: Q (Question), B (Bomb), G (Gift)
-            boxTypes = new Array(totalBoxes).fill('Q');
+            div.innerHTML = `
+                <div class="flex-1 pr-2">
+                    <p class="text-[9px] font-bold text-blue-400 uppercase tracking-tighter">${isActive ? '• IN MISSION' : ''}</p>
+                    <p class="font-bold text-sm truncate text-white">${name}</p>
+                </div>
+                <div class="bg-white/10 px-3 py-1 rounded-lg text-xs font-black text-blue-300 sci-fi-font">
+                    ${gameState.scores[name]}
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function selectStudent(name) {
+        gameState.activeStudent = name;
+        document.getElementById('active-player-info').classList.remove('hidden');
+        document.getElementById('display-active-name').innerText = name;
+        renderStudentList();
+    }
+
+    function handleBoxClick(boxId) {
+        if (gameState.sessionEnded) return;
+        if (!gameState.activeStudent) {
+            showToast("ASTRONAUT TIDAK TERDETEKSI! Pilih siswa di sidebar.");
+            return;
+        }
+
+        const boxEl = document.getElementById(boxId);
+        boxEl.classList.add('shaking');
+
+        setTimeout(() => {
+            boxEl.classList.remove('shaking');
+            showQuestion(boxId);
+        }, 800);
+    }
+
+    function showQuestion(boxId) {
+        let questions = questionBank[boxId];
+        let pool = questions.filter(q => !gameState.usedQuestions[boxId].includes(q));
+
+        // Recycling logic
+        if (pool.length === 0) {
+            pool = [...questions].sort((a,b) => (a.failedCount || 0) - (b.failedCount || 0));
+        }
+
+        const randomIndex = Math.floor(Math.random() * pool.length);
+        const question = pool[randomIndex];
+        
+        gameState.currentQuestion = question;
+        gameState.currentBox = boxId;
+
+        // Calculate points with recycling penalty (-2 per fail)
+        const failedTimes = question.failedCount || 0;
+        const potentialPoint = Math.max(2, BOX_RULES[boxId].win - (failedTimes * 2));
+
+        document.getElementById('modal-topic').innerText = boxId.toUpperCase().replace('BOX', 'PORTAL ');
+        document.getElementById('point-tag').innerText = potentialPoint + " CREDITS";
+        document.getElementById('question-text').innerText = question.q;
+        
+        const optContainer = document.getElementById('options-container');
+        optContainer.innerHTML = "";
+        question.o.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = "text-left p-6 rounded-2xl border border-white/5 hover:border-blue-400 hover:bg-blue-400/10 transition-all font-semibold text-slate-300 flex items-center group relative overflow-hidden";
+            btn.innerHTML = `
+                <span class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center mr-4 text-[10px] sci-fi-font text-blue-400 group-hover:bg-blue-400 group-hover:text-slate-900 transition-colors">${String.fromCharCode(65 + idx)}</span>
+                <span class="relative z-10">${opt}</span>
+            `;
+            btn.onclick = () => submitAnswer(idx);
+            optContainer.appendChild(btn);
+        });
+
+        const modal = document.getElementById('question-modal');
+        const content = document.getElementById('modal-content');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+        }, 50);
+    }
+
+    function submitAnswer(idx) {
+        const q = gameState.currentQuestion;
+        const boxId = gameState.currentBox;
+        const failedTimes = q.failedCount || 0;
+        const winPoint = Math.max(2, BOX_RULES[boxId].win - (failedTimes * 2));
+        const losePoint = BOX_RULES[boxId].lose;
+
+        if (idx === q.a) {
+            gameState.scores[gameState.activeStudent] += winPoint;
+            if (!gameState.usedQuestions[boxId].includes(q)) gameState.usedQuestions[boxId].push(q);
+            showFeedback(`DATA VALID! +${winPoint} CREDITS`, "success");
+        } else {
+            gameState.scores[gameState.activeStudent] += losePoint;
+            q.failedCount = (q.failedCount || 0) + 1;
+            showFeedback(`BREACH DETECTED! ${losePoint} CREDITS`, "error");
+        }
+
+        closeModal();
+        renderStudentList();
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('question-modal');
+        const content = document.getElementById('modal-content');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+
+    function confirmEndSession() {
+        if(confirm("Yakin ingin mengakhiri sesi misi sekarang? Data akan dikunci dan Leaderboard akan ditampilkan.")) {
+            endSession();
+        }
+    }
+
+    function endSession() {
+        gameState.sessionEnded = true;
+        const body = document.getElementById('recap-body');
+        body.innerHTML = "";
+        
+        document.getElementById('recap-class-id').innerText = `MISSION LOG: KELAS ${gameState.currentClass}`;
+        
+        // Sorting high to low
+        const sorted = Object.entries(gameState.scores).sort((a,b) => b[1] - a[1]);
+        
+        sorted.forEach(([name, score], idx) => {
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-white/5 transition-colors group";
             
-            // Sisipkan Bom dan Bonus di posisi acak
-            const positions = Array.from({length: totalBoxes}, (_, i) => i);
-            for (let i = positions.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [positions[i], positions[j]] = [positions[j], positions[i]];
-            }
+            let rankDisplay = idx + 1;
+            let rankClass = "";
+            if(idx === 0) { rankDisplay = "🥇"; rankClass = "rank-1 text-2xl"; }
+            else if(idx === 1) { rankDisplay = "🥈"; rankClass = "rank-2 text-2xl"; }
+            else if(idx === 2) { rankDisplay = "🥉"; rankClass = "rank-3 text-2xl"; }
 
-            boxTypes[positions[0]] = 'B'; 
-            boxTypes[positions[1]] = 'B';
-            boxTypes[positions[2]] = 'G';
-            boxTypes[positions[3]] = 'G';
+            tr.innerHTML = `
+                <td class="py-6 px-4 sci-fi-font font-black ${rankClass}">${rankDisplay}</td>
+                <td class="py-6 px-4 font-bold text-white group-hover:text-blue-300 transition-colors">${name}</td>
+                <td class="py-6 px-4 text-right font-black sci-fi-font text-blue-400">${score}</td>
+            `;
+            body.appendChild(tr);
+        });
 
-            for (let i = 0; i < totalBoxes; i++) {
-                const box = document.createElement('div');
-                box.className = 'mystery-box';
-                box.innerText = i + 1;
-                box.dataset.index = i;
-                box.onclick = () => openBox(box);
-                grid.appendChild(box);
-            }
-        }
+        document.getElementById('recap-modal').classList.remove('hidden');
+    }
 
-        document.getElementById('roll-btn').onclick = function() {
-            if (isRolling) return;
-            
-            isRolling = true;
-            const target = document.getElementById('target-name');
-            let counter = 0;
-            const maxTicks = 25;
-            
-            const interval = setInterval(() => {
-                const randomName = students[Math.floor(Math.random() * students.length)];
-                target.innerText = randomName;
-                target.style.opacity = (counter % 2 === 0) ? "0.5" : "1";
-                counter++;
-                
-                if (counter >= maxTicks) {
-                    clearInterval(interval);
-                    target.style.opacity = "1";
-                    target.innerText = "⭐ " + target.innerText + " ⭐";
-                    isRolling = false;
-                }
-            }, 70);
-        };
+    function showToast(msg) {
+        const toast = document.createElement('div');
+        toast.className = "fixed bottom-10 left-1/2 -translate-x-1/2 bg-red-600 text-white px-8 py-4 rounded-2xl shadow-2xl z-[200] font-black sci-fi-font text-xs tracking-widest transition-all animate-bounce border border-red-400";
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
 
-        function openBox(el) {
-            if (el.classList.contains('opened')) return;
-
-            const type = boxTypes[parseInt(el.dataset.index)];
-            const modal = document.getElementById('modal');
-            const body = document.getElementById('modal-body');
-            modal.style.display = 'flex';
-
-            if (type === 'B') {
-                body.innerHTML = `
-                    <div class="text-8xl mb-4 animate-bounce">💣</div>
-                    <h2 class="text-4xl font-title text-red-600 mb-2">BOM MELEDAK!</h2>
-                    <p class="text-gray-600 text-lg mb-8">Waduh, tim harus rela kehilangan 50 poin!</p>
-                    <button onclick="resolveBox(true, ${el.dataset.index}, -50)" class="bg-red-500 text-white px-12 py-4 rounded-2xl font-bold shadow-xl hover:bg-red-600 active:scale-95 transition-all">TIDAAKK!</button>
-                `;
-            } else if (type === 'G') {
-                body.innerHTML = `
-                    <div class="text-8xl mb-4 animate-pulse">🎁</div>
-                    <h2 class="text-4xl font-title text-green-600 mb-2">BONUS HADIAH!</h2>
-                    <p class="text-gray-600 text-lg mb-8">Keberuntungan berpihak padamu! Tambahan 100 poin.</p>
-                    <button onclick="resolveBox(true, ${el.dataset.index}, 100)" class="bg-green-500 text-white px-12 py-4 rounded-2xl font-bold shadow-xl hover:bg-green-600 active:scale-95 transition-all">TERIMA KASIH!</button>
-                `;
-            } else {
-                // Pilih soal baru setiap kali kotak (yang belum terbuka permanen) diklik
-                const qIdx = Math.floor(Math.random() * bankSoal.length);
-                const q = bankSoal[qIdx];
-                
-                body.innerHTML = `
-                    <div class="text-xs font-bold text-indigo-400 mb-4 uppercase tracking-[0.2em]">Tantangan Kotak Nomor ${parseInt(el.dataset.index)+1}</div>
-                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-8 text-left leading-relaxed">${q.q}</h2>
-                    <div class="space-y-3">
-                        ${q.o.map((opt, idx) => `
-                            <button onclick="checkAnswer(${idx}, ${q.a}, ${el.dataset.index})" class="option-btn group">
-                                <span class="w-10 h-10 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-xl mr-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">${String.fromCharCode(65+idx)}</span> 
-                                <span class="text-lg">${opt}</span>
-                            </button>
-                        `).join('')}
-                    </div>
-                    <div class="mt-10 flex justify-center border-t pt-6">
-                        <button onclick="closeModal()" class="text-gray-400 hover:text-rose-500 font-bold transition-colors">LEWATI KOTAK INI</button>
-                    </div>
-                `;
-            }
-        }
-
-        function checkAnswer(selected, correct, boxIdx) {
-            const body = document.getElementById('modal-body');
-            if (selected === correct) {
-                body.innerHTML = `
-                    <div class="text-8xl mb-6">🤩</div>
-                    <h2 class="text-5xl font-title text-emerald-500 mb-4">BENAR!</h2>
-                    <p class="text-gray-600 mb-10 text-xl font-medium">Hebat! Kamu berhasil menjawab dengan tepat. Tim mendapatkan 20 poin!</p>
-                    <button onclick="resolveBox(true, ${boxIdx}, 20)" class="bg-indigo-600 text-white px-14 py-5 rounded-[25px] font-bold text-2xl shadow-2xl hover:bg-indigo-700 active:scale-95 transition-all">AMBIL POIN</button>
-                `;
-            } else {
-                body.innerHTML = `
-                    <div class="text-8xl mb-6">❌</div>
-                    <h2 class="text-5xl font-title text-rose-500 mb-4">SALAH!</h2>
-                    <p class="text-gray-600 mb-10 text-xl font-medium">Ups, jawabannya belum tepat. <br>Kotak akan ditutup lagi, pelajari lagi materinya ya!</p>
-                    <button onclick="closeModal()" class="bg-slate-800 text-white px-14 py-5 rounded-[25px] font-bold text-2xl shadow-2xl active:scale-95 transition-all">COBA LAGI NANTI</button>
-                `;
-            }
-        }
-
-        function resolveBox(isFinished, boxIdx, pointChange) {
-            score += pointChange;
-            if (score < 0) score = 0;
-            document.getElementById('score-val').innerText = score;
-
-            if (isFinished) {
-                const box = document.querySelector(`.mystery-box[data-index="${boxIdx}"]`);
-                box.classList.add('opened');
-                box.innerHTML = '⭐'; // Tanda kotak sudah selesai
-                box.onclick = null;
-            }
-            closeModal();
-        }
-
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-        }
-
-        window.onload = initGame;
-    </script>
+    function showFeedback(msg, type) {
+        const toast = document.createElement('div');
+        const bgColor = type === 'success' ? 'bg-blue-500 shadow-blue-500/50' : 'bg-red-600 shadow-red-500/50';
+        toast.className = `fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${bgColor} text-white px-16 py-8 rounded-[2rem] shadow-2xl z-[205] font-black text-4xl game-font tracking-widest scale-125 transition-all`;
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translate(-50%, -50%) scale(1.5)';
+            setTimeout(() => toast.remove(), 500);
+        }, 1200);
+    }
+</script>
 </body>
 </html>
