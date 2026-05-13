@@ -3,275 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escape Room: The Digital Vault</title>
+    <title>Game Kotak Misteri Peluang</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon-cyan: #00f2ff;
-            --neon-purple: #9d00ff;
-            --bg-deep: #020617;
+            --primary: #6366f1;
+            --secondary: #f43f5e;
+            --accent: #fbbf24;
+            --success: #10b981;
+            --bg-game: #f0f4ff;
         }
 
         body {
-            background-color: var(--bg-deep);
-            color: #e2e8f0;
-            font-family: 'Rajdhani', sans-serif;
-            overflow: hidden;
+            font-family: 'Quicksand', sans-serif;
+            background-color: var(--bg-game);
+            background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
-        .font-cyber { font-family: 'Orbitron', sans-serif; }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--neon-cyan);
-            border-radius: 10px;
-            box-shadow: 0 0 10px var(--neon-cyan);
+        h1, h2, .font-title {
+            font-family: 'Fredoka One', cursive;
         }
 
-        /* Cyberpunk Background Effect */
-        .grid-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            z-index: -1;
-            perspective: 500px;
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 12px;
         }
 
-        .neon-border {
-            border: 1px solid var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3), inset 0 0 15px rgba(0, 242, 255, 0.1);
-        }
-
-        .neon-text {
-            text-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        .btn-action {
-            background: rgba(0, 242, 255, 0.1);
-            border: 2px solid var(--neon-cyan);
-            transition: all 0.3s;
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
-        }
-
-        .btn-action:hover {
-            background: var(--neon-cyan);
-            color: black;
-            box-shadow: 0 0 25px var(--neon-cyan);
-        }
-
-        .screen { display: none; height: 100vh; width: 100vw; }
-        .screen.active { display: flex; animation: fadeIn 0.5s ease-in-out; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: scale(1.05); } to { opacity: 1; transform: scale(1); } }
-
-        .avatar-card {
-            transition: all 0.3s;
+        .mystery-box {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            border-radius: 20px;
             cursor: pointer;
-            filter: grayscale(0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 0 #312e81, 0 12px 15px rgba(0,0,0,0.1);
+            position: relative;
+            user-select: none;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        .avatar-card.selected {
-            filter: grayscale(0);
-            border-color: var(--neon-cyan);
-            background: rgba(0, 242, 255, 0.2);
-            transform: scale(1.1);
+        .mystery-box:hover {
+            transform: translateY(-5px);
+            filter: brightness(1.1);
         }
 
-        .door {
-            transition: all 0.5s;
-            perspective: 1000px;
+        .mystery-box.opened {
+            background: #e2e8f0;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
+            transform: none;
+            cursor: default;
+            color: #94a3b8;
+            text-shadow: none;
         }
 
-        .door-inner {
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
+        .name-display {
+            background: #fff;
+            border: 4px solid var(--primary);
+            border-radius: 24px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .door:hover:not(.locked) .door-inner {
-            transform: rotateY(-20deg);
+        .rolling-text {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #4338ca;
+            text-align: center;
+            padding: 0 1rem;
+            animation: pulse 1s infinite alternate;
         }
 
-        .locked { filter: grayscale(1) brightness(0.5); cursor: not-allowed; }
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
 
-        #ticker {
+        .modal {
+            display: none;
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 280px;
-            background: rgba(0,0,0,0.8);
-            border-left: 4px solid var(--neon-purple);
-            padding: 10px;
-            font-size: 0.85rem;
-            z-index: 100;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 1.2rem;
+            margin: 0.5rem 0;
+            background: #f8fafc;
+            border: 3px solid #e2e8f0;
+            border-radius: 20px;
+            font-weight: 700;
+            transition: all 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-btn:hover {
+            background: #eef2ff;
+            border-color: #6366f1;
+            transform: translateX(8px);
         }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8 min-h-screen">
 
-    <div class="grid-bg"></div>
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-5xl md:text-6xl text-indigo-700 mb-2 drop-shadow-lg">KOTAK MISTERI PELUANG</h1>
+            <div class="inline-block bg-indigo-100 px-6 py-2 rounded-full">
+                <p class="text-indigo-600 font-bold tracking-widest uppercase text-sm">Uji Keberuntungan & Logika Matematikamu!</p>
+            </div>
+        </header>
 
-    <div id="ticker" class="font-cyber text-purple-400">
-        <div id="ticker-content">Menghubungkan ke Vault...</div>
-    </div>
-
-    <!-- 1. LOGIN SCREEN -->
-    <section id="loginScreen" class="screen active items-center justify-center flex-col px-4">
-        <div class="max-w-2xl w-full bg-slate-900/80 backdrop-blur-xl p-8 rounded-2xl neon-border text-center">
-            <h1 class="text-4xl md:text-5xl font-cyber neon-text mb-2">THE DIGITAL VAULT</h1>
-            <p class="text-cyan-400 mb-8 tracking-widest uppercase text-sm">System Security Protocol: Probability</p>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <div class="mb-6">
-                <label class="block text-left mb-2 text-slate-400 font-bold tracking-widest">NAMA PENJELAJAH:</label>
-                <input type="text" id="playerName" class="w-full bg-black/50 border border-slate-700 p-4 rounded text-cyan-300 focus:outline-none focus:border-cyan-400 text-xl font-bold" placeholder="Masukkan ID kamu...">
-            </div>
-
-            <p class="text-left mb-2 text-slate-400 font-bold tracking-widest uppercase">PILIH AVATAR 3D:</p>
-            <div class="grid grid-cols-4 gap-4 mb-8">
-                <div class="avatar-card border-2 border-slate-700 rounded-xl p-2 selected" onclick="selectAvatar(0, this)">
-                    <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Felix&backgroundColor=b6e3f4" alt="Robot 1" class="rounded-lg">
-                </div>
-                <div class="avatar-card border-2 border-slate-700 rounded-xl p-2" onclick="selectAvatar(1, this)">
-                    <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Aneka&backgroundColor=c0aede" alt="Robot 2" class="rounded-lg">
-                </div>
-                <div class="avatar-card border-2 border-slate-700 rounded-xl p-2" onclick="selectAvatar(2, this)">
-                    <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Harley&backgroundColor=ffd5dc" alt="Robot 3" class="rounded-lg">
-                </div>
-                <div class="avatar-card border-2 border-slate-700 rounded-xl p-2" onclick="selectAvatar(3, this)">
-                    <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Buster&backgroundColor=d1d4f9" alt="Robot 4" class="rounded-lg">
-                </div>
-            </div>
-
-            <button onclick="enterLobby()" class="btn-action w-full py-4 text-xl font-cyber">MULAI DEKRIPSI</button>
-        </div>
-    </section>
-
-    <!-- 2. LOBBY / DOOR SELECTION -->
-    <section id="lobbyScreen" class="screen items-center justify-center flex-col px-4">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-cyber neon-text mb-2">VAULT CHAMBERS</h2>
-            <p id="lobbyWelcome" class="text-slate-400">Pilih ruangan untuk memulai ujian.</p>
-        </div>
-
-        <div class="flex flex-wrap justify-center gap-8">
-            <div onclick="startRoom(1)" class="door w-64 h-80 cursor-pointer">
-                <div class="door-inner h-full w-full bg-slate-900 neon-border rounded-lg flex flex-col items-center justify-center p-6 text-center">
-                    <div class="text-5xl text-cyan-400 mb-4"><i class="fa-solid fa-dice"></i></div>
-                    <h3 class="font-cyber text-lg mb-2">ROOM 01</h3>
-                    <p class="text-xs text-slate-500 uppercase tracking-tighter">Konsep Dasar Peluang</p>
-                    <div class="mt-auto text-xs text-cyan-500 font-bold">TERBUKA</div>
-                </div>
-            </div>
-
-            <div id="door2" onclick="startRoom(2)" class="door w-64 h-80 locked">
-                <div class="door-inner h-full w-full bg-slate-900 border border-slate-700 rounded-lg flex flex-col items-center justify-center p-6 text-center">
-                    <div class="text-5xl text-slate-700 mb-4"><i class="fa-solid fa-chart-pie"></i></div>
-                    <h3 class="font-cyber text-lg mb-2">ROOM 02</h3>
-                    <p class="text-xs text-slate-500 uppercase tracking-tighter">Nilai & Komplemen</p>
-                    <div class="mt-auto text-xs text-slate-500 font-bold">TERKUNCI</div>
-                </div>
-            </div>
-
-            <div id="door3" onclick="startRoom(3)" class="door w-64 h-80 locked">
-                <div class="door-inner h-full w-full bg-slate-900 border border-slate-700 rounded-lg flex flex-col items-center justify-center p-6 text-center">
-                    <div class="text-5xl text-slate-700 mb-4"><i class="fa-solid fa-bolt"></i></div>
-                    <h3 class="font-cyber text-lg mb-2">ROOM 03</h3>
-                    <p class="text-xs text-slate-500 uppercase tracking-tighter">Frekuensi Harapan</p>
-                    <div class="mt-auto text-xs text-slate-500 font-bold">TERKUNCI</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 3. GAMEPLAY SCREEN -->
-    <section id="gameScreen" class="screen items-center justify-center flex-col px-4 bg-black/40">
-        <div class="w-full max-w-5xl flex flex-col h-[90vh]">
-            <div class="flex justify-between items-end mb-4">
-                <div>
-                    <h4 id="roomLabel" class="font-cyber text-cyan-400 text-sm">ROOM 01 // DECRYPTING</h4>
-                    <div id="roomStatus" class="text-xs text-slate-500 uppercase">Phase: Initial Testing</div>
-                </div>
-                <div class="text-right">
-                    <div class="text-xs text-slate-400">PROGRESS</div>
-                    <div class="font-cyber text-xl" id="progressText">01 / 15</div>
-                </div>
-            </div>
-
-            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-6 border border-slate-700">
-                <div id="progressBar" class="bg-cyan-400 h-full w-0 shadow-[0_0_10px_#00f2ff] transition-all duration-500"></div>
-            </div>
-
-            <div class="flex-grow flex flex-col md:flex-row gap-6 overflow-hidden">
-                <!-- Question Card -->
-                <div class="flex-1 bg-slate-900/90 neon-border rounded-2xl p-6 md:p-8 flex flex-col overflow-y-auto">
-                    <div class="mb-4 text-xs font-cyber text-purple-400 sticky top-0 bg-slate-900/90 py-1">QUESTION_LOG:</div>
-                    <p id="questionText" class="text-lg md:text-2xl font-semibold leading-relaxed mb-6">Loading system data...</p>
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-white p-8 rounded-[40px] shadow-2xl border-b-[12px] border-indigo-200">
+                    <h2 class="text-xl text-center text-indigo-500 mb-6 font-title tracking-wide">SIAPA YANG MAJU?</h2>
                     
-                    <div id="optionsGrid" class="mt-auto grid grid-cols-1 gap-3 pb-4">
-                        <!-- Options injected here -->
+                    <div id="randomizer" class="name-display mb-6">
+                        <div id="target-name" class="rolling-text font-title">SIAP MAIN?</div>
                     </div>
-                </div>
 
-                <!-- Player Card -->
-                <div class="w-full md:w-64 flex flex-col gap-4">
-                    <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-4 text-center">
-                        <img id="playerAvatarImg" src="" class="w-20 h-20 mx-auto mb-2 bg-slate-800 rounded-full border-2 border-cyan-500 p-2">
-                        <div id="displayPlayerName" class="font-cyber text-sm text-cyan-300 truncate">USER_NAME</div>
-                        <div class="text-[10px] text-slate-500 uppercase mt-1">Status: Active</div>
-                    </div>
-                    <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-4 flex-grow hidden md:flex flex-col">
-                        <div class="text-[10px] font-cyber text-purple-400 mb-2">SYSTEM_MESSAGES:</div>
-                        <div id="gameLog" class="text-xs text-slate-400 flex flex-col gap-2 overflow-hidden">
-                            <p>> Menunggu input...</p>
+                    <button id="roll-btn" class="w-full bg-rose-500 hover:bg-rose-600 text-white py-5 rounded-3xl font-bold text-2xl shadow-[0_8px_0_#be123c] transition-all active:translate-y-1 active:shadow-none mb-6 flex items-center justify-center gap-3">
+                        <span>🎯</span> ACAK NAMA!
+                    </button>
+
+                    <div class="pt-6 border-t-2 border-dashed border-gray-100">
+                        <div class="flex justify-between items-center bg-indigo-50 p-6 rounded-[30px]">
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-indigo-400 uppercase">Skor Tim Saat Ini</p>
+                                <span id="score-val" class="text-5xl text-indigo-600 font-title">0</span>
+                            </div>
+                            <div class="text-5xl">🏆</div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- 4. SUMMARY SCREEN -->
-    <section id="summaryScreen" class="screen items-center justify-center flex-col px-4">
-        <div id="summaryCard" class="max-w-md w-full bg-slate-900/90 neon-border p-8 rounded-2xl text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-cyan-400 shadow-[0_0_15px_#00f2ff]"></div>
-            <h2 class="text-2xl font-cyber neon-text mb-6">VAULT CLEARANCE</h2>
-            <div class="flex justify-center mb-6">
-                <div class="relative">
-                    <img id="sumAvatar" src="" class="w-32 h-32 bg-slate-800 rounded-full border-4 border-cyan-500 p-2">
-                    <div id="sumBadge" class="absolute -bottom-2 -right-2 font-bold px-3 py-1 rounded text-xs shadow-lg">LULUS</div>
+                <div class="bg-gradient-to-br from-indigo-600 to-blue-700 p-8 rounded-[40px] text-white shadow-xl">
+                    <h3 class="font-bold text-xl mb-4 flex items-center gap-3 font-title"><span>📝</span> PETUNJUK</h3>
+                    <ul class="text-sm space-y-3 opacity-95 font-medium leading-relaxed">
+                        <li class="flex gap-2"><span>1.</span> Acak nama untuk memilih siapa yang akan menjawab.</li>
+                        <li class="flex gap-2"><span>2.</span> Klik kotak misteri mana saja.</li>
+                        <li class="flex gap-2"><span>3.</span> Jika <b>Salah</b> atau <b>Lewat</b>, kotak tutup lagi & soal akan diganti baru!</li>
+                    </ul>
                 </div>
             </div>
-            <div class="mb-6">
-                <div id="sumName" class="text-3xl font-bold text-white mb-1 uppercase tracking-wider">PLAYER NAME</div>
-                <div id="sumRoom" class="text-sm text-cyan-400 font-cyber">ROOM 01: KONSEP PELUANG</div>
-            </div>
-            <div class="grid grid-cols-2 gap-4 mb-8">
-                <div class="bg-black/40 p-4 rounded-xl border border-slate-700">
-                    <div class="text-[10px] text-slate-500 uppercase">Akurasi Awal</div>
-                    <div id="sumAccuracy" class="text-2xl font-cyber text-cyan-400">0%</div>
-                </div>
-                <div class="bg-black/40 p-4 rounded-xl border border-slate-700">
-                    <div class="text-[10px] text-slate-500 uppercase">Total Soal</div>
-                    <div id="sumTotal" class="text-2xl font-cyber text-purple-400">15/15</div>
+
+            <div class="lg:col-span-8 bg-white p-8 rounded-[40px] shadow-2xl border-b-[12px] border-gray-100">
+                <div id="grid" class="grid-container">
+                    <!-- Kotak akan di-render di sini -->
                 </div>
             </div>
-            <p id="sumMessage" class="text-sm text-slate-400 mb-8 italic">"Kemampuan analisis kamu cukup untuk membuka pintu selanjutnya."</p>
-            <button onclick="finishAndLobby()" class="btn-action w-full py-4 text-lg font-cyber">KEMBALI KE LOBBY</button>
         </div>
-    </section>
+    </div>
+
+    <div id="modal" class="modal">
+        <div id="modal-body" class="modal-content">
+            <!-- Konten dinamis (Soal, Bom, Bonus) -->
+        </div>
+    </div>
 
     <script>
-        const room1_bank = [
+        const students = [
+            "ACH FAUZAN ABDILLAH", "AL-KHADAFI AQILAH AR-ZAKIAN", "ANINDYA RASYIDTA DEWA DANISWARA", 
+            "ASTAGINA DEWI MAULIDYA", "AURA KARISSA PUTRI", "BINTANG MAULANA RAHMAD WIJAYA", 
+            "DAFFA RIZKI SAPUTRA", "DEWI BAYU PUTRI PITALOKA", "DISMA PUTRI OKTAVIA", 
+            "ELIRICA ALIYAH", "FAUZIA AULIA PUTRI", "GENRE ANEVAY RADISTA", 
+            "HANI FADHILAH", "LOVLY DIANAH KAMILAH", "MUHAMMAD GILANG RAMADHAN", 
+            "MUHAMMAD MISBAHUS SURUR", "NADHIF AZKA KIRANSYAH", "NADRASYAH PARSA KALENA", 
+            "ERA PUTRI ARIA WATIN", "OVAL DWI PUTRA HARIANTO", "RAMA RAFAEL SAPUTRA", 
+            "REIHAN RIZQI RAMADHAN", "REVAN ARIA PUTRA", "SAKTI PRASMUDA WARDANI AL-AMIN", 
+            "SITI HUDAIFAH", "TIRTA JAVIER PRAWIRA", "ZAHRA FIRA HARIANTO", 
+            "ZIVA NUR MAULIDYA", "SILVA PUTRI ANDRIANA"
+        ];
+
+        const bankSoal = [
+            // Bagian 1: Ruang Sampel & Kejadian
             {q: "Dua buah dadu dilempar bersama-sama. Banyak kejadian muncul jumlah mata dadu 8 adalah ....", o: ["3","4","5","6"], a: 2},
             {q: "Sebuah koin dilempar tiga kali. Banyak kejadian muncul tepat dua gambar adalah ....", o: ["2","3","4","5"], a: 1},
             {q: "Sebuah kartu bernomor 1 sampai 15 diambil satu kartu. Banyak kejadian terambil bilangan prima adalah ....", o: ["5","6","7","8"], a: 1},
@@ -296,10 +239,9 @@
             {q: "Sebuah koin dilempar tiga kali. Banyak ruang sampel yang mungkin adalah ....", o: ["6","8","10","12"], a: 1},
             {q: "Sebuah spinner memiliki 4 warna dan sebuah dadu dilempar bersama-sama. Banyak ruang sampel yang mungkin adalah ....", o: ["10","18","24","30"], a: 2},
             {q: "Dua kartu diambil berturut-turut dari kartu bernomor 1 sampai 5 tanpa pengembalian. Banyak ruang sampel yang mungkin adalah ....", o: ["10","15","20","25"], a: 2},
-            {q: "Sebuah dadu dilempar dua kali. Banyak ruang sampel yang mungkin adalah ....", o: ["12","24","30","36"], a: 3}
-        ];
+            {q: "Sebuah dadu dilempar dua kali. Banyak ruang sampel yang mungkin adalah ....", o: ["12","24","30","36"], a: 3},
 
-        const room2_partA = [
+            // Bagian 2: Peluang Teoretik
             {q: "Sebuah dadu dilempar satu kali. Peluang muncul mata dadu genap adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 2},
             {q: "Sebuah koin dilempar satu kali. Peluang muncul gambar adalah ....", o: ["1/4","1/3","1/2","1"], a: 2},
             {q: "Sebuah dadu dilempar satu kali. Peluang muncul bilangan prima adalah ....", o: ["1/6","1/3","1/2","2/3"], a: 2},
@@ -314,10 +256,9 @@
             {q: "Dua buah dadu dilempar bersama-sama. Peluang muncul pasangan bilangan sama adalah ....", o: ["1/12","1/9","1/6","1/3"], a: 2},
             {q: "Sebuah kartu bernomor 1 sampai 15 diambil satu kartu. Peluang terambil bilangan prima adalah ....", o: ["2/15","4/15","6/15","8/15"], a: 2},
             {q: "Sebuah dadu dilempar dua kali. Peluang jumlah kedua mata dadu 8 adalah ....", o: ["1/18","5/36","1/6","7/36"], a: 1},
-            {q: "Sebuah bola diambil dari kotak berisi 5 bola merah dan 3 bola biru. Peluang terambil bola biru adalah ....", o: ["1/8","3/8","5/8","3/5"], a: 1}
-        ];
+            {q: "Sebuah bola diambil dari kotak berisi 5 bola merah dan 3 bola biru. Peluang terambil bola biru adalah ....", o: ["1/8","3/8","5/8","3/5"], a: 1},
 
-        const room2_partB = [
+            // Bagian 3: Komplemen & Peluang Empiris
             {q: "Peluang seorang siswa lulus ujian adalah 0,8. Peluang siswa tidak lulus adalah ....", o: ["0,1","0,2","0,3","0,4"], a: 1},
             {q: "Peluang turun hujan hari ini adalah 0,35. Peluang tidak turun hujan adalah ....", o: ["0,45","0,55","0,65","0,75"], a: 2},
             {q: "Peluang sebuah lampu menyala adalah 3/5. Peluang lampu tidak menyala adalah ....", o: ["1/5","2/5","3/5","4/5"], a: 1},
@@ -332,10 +273,9 @@
             {q: "Sebuah dadu dilempar 60 kali dan muncul mata dadu 5 sebanyak 12 kali. Peluang empiris muncul mata dadu 5 adalah ....", o: ["1/10","1/5","1/4","1/3"], a: 1},
             {q: "Dalam 50 kali percobaan, sebuah bola merah terambil 15 kali. Peluang empiris terambil bola merah adalah ....", o: ["1/5","3/10","2/5","1/2"], a: 1},
             {q: "Sebuah spinner diputar 80 kali dan warna biru muncul 20 kali. Peluang empiris muncul warna biru adalah ....", o: ["1/5","1/4","3/10","2/5"], a: 1},
-            {q: "Sebuah koin dilempar 100 kali dan muncul angka sebanyak 56 kali. Peluang empiris muncul angka adalah ....", o: ["11/25","13/25","14/25","16/25"], a: 2}
-        ];
+            {q: "Sebuah koin dilempar 100 kali dan muncul angka sebanyak 56 kali. Peluang empiris muncul angka adalah ....", o: ["11/25","13/25","14/25","16/25"], a: 2},
 
-        const room3_bank = [
+            // Bagian 4: Frekuensi Harapan
             {q: "Sebuah dadu dilempar 60 kali. Frekuensi harapan muncul mata dadu 3 adalah ....", o: ["5","10","15","20"], a: 1},
             {q: "Sebuah koin dilempar 40 kali. Frekuensi harapan muncul gambar adalah ....", o: ["10","15","20","25"], a: 2},
             {q: "Sebuah dadu dilempar 72 kali. Frekuensi harapan muncul bilangan genap adalah ....", o: ["24","30","36","42"], a: 2},
@@ -347,167 +287,157 @@
             {q: "Sebuah koin dilempar 100 kali. Frekuensi harapan muncul angka adalah ....", o: ["25","40","50","75"], a: 2},
             {q: "Sebuah kartu bernomor 1 sampai 20 diambil acak sebanyak 80 kali. Frekuensi harapan terambil kelipatan 5 adalah ....", o: ["12","16","20","24"], a: 1},
             {q: "Peluang muncul mata dadu prima adalah 1/2. Jika sebuah dadu dilempar 70 kali, frekuensi harapan tidak muncul mata dadu prima adalah ....", o: ["25","30","35","40"], a: 2},
-            {q: "Peluang seorang pemain sepak bola gagal mencetak gol penalti adalah 0,2. Jika melakukan 60 tendangan, frekuensi harapan berhasil mencetak gol adalah ....", o: ["42","45","48","50"], a: 2},
-            {q: "Peluang seorang siswa datang terlambat adalah 0,1. Jika ada 250 hari sekolah, frekuensi harapan siswa datang tepat waktu adalah ....", o: ["200","210","225","240"], a: 2},
-            {q: "Peluang turun hujan hari ini adalah 0,25. Selama 40 hari, frekuensi harapan hari tidak hujan adalah ....", o: ["20","25","30","35"], a: 2},
-            {q: "Peluang sebuah mesin menghasilkan barang cacat adalah 0,08. Jika mesin menghasilkan 500 barang, frekuensi harapan barang tidak cacat adalah ....", o: ["420","440","460","480"], a: 3},
-            {q: "Peluang seorang pemain basket berhasil memasukkan bola adalah 0,7. Jika melakukan 50 tembakan, frekuensi harapan tembakan gagal adalah ....", o: ["10","15","20","25"], a: 1},
-            {q: "Peluang muncul bilangan genap saat dadu dilempar adalah 1/2. Jika dadu dilempar 90 kali, frekuensi harapan tidak muncul bilangan genap adalah ....", o: ["30","40","45","50"], a: 2},
-            {q: "Sebuah toko mencatat peluang pelanggan membeli roti adalah 0,4. Jika ada 200 pelanggan, frekuensi harapan pelanggan membeli roti adalah ....", o: ["40","60","80","100"], a: 2},
-            {q: "Peluang seorang printer rusak 0,04. Jika digunakan 300 kali, frekuensi harapan printer tidak rusak adalah ....", o: ["276","282","288","294"], a: 2},
-            {q: "Peluang bus datang tepat waktu 0,9. Dalam 150 perjalanan, frekuensi harapan bus terlambat adalah ....", o: ["10","12","15","20"], a: 2}
+            {q: "Peluang pemain sepak bola gagal mencetak gol penalti 0,2. Jika melakukan 60 tendangan, frekuensi harapan gol adalah ....", o: ["42","45","48","50"], a: 2},
+            {q: "Peluang siswa datang terlambat 0,1. Jika ada 250 hari sekolah, frekuensi harapan datang tepat waktu adalah ....", o: ["200","210","225","240"], a: 2},
+            {q: "Peluang turun hujan hari ini 0,25. Selama 40 hari, frekuensi harapan hari tidak hujan adalah ....", o: ["20","25","30","35"], a: 2},
+            {q: "Peluang mesin hasilkan barang cacat 0,08. Jika mesin hasilkan 500 barang, frekuensi harapan barang baik adalah ....", o: ["420","440","460","480"], a: 2},
+            {q: "Peluang pemain basket masuk bola 0,7. Jika melakukan 50 tembakan, frekuensi harapan tembakan gagal adalah ....", o: ["10","15","20","25"], a: 1},
+            {q: "Peluang angka genap saat dadu dilempar 1/2. Jika dilempar 90 kali, frekuensi harapan tidak muncul genap adalah ....", o: ["30","40","45","50"], a: 2},
+            {q: "Peluang pelanggan beli roti 0,4. Jika ada 200 pelanggan, frekuensi harapan pelanggan beli roti adalah ....", o: ["40","60","80","100"], a: 2},
+            {q: "Peluang printer rusak 0,04. Jika digunakan 300 kali, frekuensi harapan printer tidak rusak adalah ....", o: ["276","282","288","294"], a: 2},
+            {q: "Peluang bus tepat waktu 0,9. Dalam 150 perjalanan, frekuensi harapan bus terlambat adalah ....", o: ["10","12","15","20"], a: 2}
         ];
 
-        let player = { name: "", avatar: 0, unlocked: [1] };
-        let currentRoom = 0;
-        let questions = [];
-        let index = 0;
-        let mistakes = [];
-        let firstPassScore = 0;
-        let initialQuestionsCount = 0;
-        let isRevisiting = false;
+        let score = 0;
+        let isRolling = false;
+        const totalBoxes = 30;
+        let boxTypes = [];
 
-        const dummyPlayers = ["Aris_Bot", "Santi_Cyber", "Rudi_99", "Nina_X", "Eko_Vault", "Maya_Bit", "Zaki_N0de"];
-        setInterval(() => {
-            const ticker = document.getElementById('ticker-content');
-            const randomPlayer = dummyPlayers[Math.floor(Math.random() * dummyPlayers.length)];
-            const actions = ["baru saja memasuki Ruang 1", "sedang mengerjakan Ruang 2", "berhasil membuka Ruang 3", "mendapatkan skor 90%!", "mengulang Ruang 1"];
-            ticker.style.opacity = 0;
-            setTimeout(() => {
-                ticker.innerText = `${randomPlayer} ${actions[Math.floor(Math.random() * actions.length)]}`;
-                ticker.style.opacity = 1;
-            }, 300);
-        }, 6000);
-
-        function selectAvatar(idx, el) {
-            document.querySelectorAll('.avatar-card').forEach(c => c.classList.remove('selected'));
-            el.classList.add('selected');
-            player.avatar = idx;
-        }
-
-        function enterLobby() {
-            const nameInput = document.getElementById('playerName').value;
-            if (!nameInput) return alert("Masukkan ID kamu!");
-            player.name = nameInput;
-            document.getElementById('lobbyWelcome').innerText = `Siap mendekripsi, ${player.name}? Pilih ruangan di bawah.`;
-            document.getElementById('loginScreen').classList.remove('active');
-            document.getElementById('lobbyScreen').classList.add('active');
-            updateDoors();
-        }
-
-        function updateDoors() {
-            if (player.unlocked.includes(2)) {
-                document.getElementById('door2').classList.remove('locked');
-                document.getElementById('door2').querySelector('.mt-auto').innerText = "TERBUKA";
-                document.getElementById('door2').querySelector('i').className = "fa-solid fa-chart-pie text-cyan-400 mb-4";
-            }
-            if (player.unlocked.includes(3)) {
-                document.getElementById('door3').classList.remove('locked');
-                document.getElementById('door3').querySelector('.mt-auto').innerText = "TERBUKA";
-                document.getElementById('door3').querySelector('i').className = "fa-solid fa-bolt text-cyan-400 mb-4";
-            }
-        }
-
-        function startRoom(num) {
-            if (!player.unlocked.includes(num)) return;
-            currentRoom = num;
-            index = 0;
-            firstPassScore = 0;
-            mistakes = [];
-            isRevisiting = false;
-
-            if (num === 1) questions = room1_bank.sort(() => 0.5 - Math.random()).slice(0, 15);
-            else if (num === 2) questions = [...room2_partA.sort(() => 0.5-Math.random()).slice(0,10), ...room2_partB.sort(() => 0.5-Math.random()).slice(0,10)];
-            else questions = room3_bank.sort(() => 0.5 - Math.random()).slice(0, 15);
-
-            initialQuestionsCount = questions.length;
-            document.getElementById('playerAvatarImg').src = document.querySelectorAll('.avatar-card img')[player.avatar].src;
-            document.getElementById('displayPlayerName').innerText = player.name;
-            document.getElementById('roomLabel').innerText = `ROOM 0${num} // DECRYPTING`;
-            document.getElementById('gameLog').innerHTML = `<p>> Inisialisasi Vault Ruangan ${num}...</p><p>> Dekripsi dimulai.</p>`;
-
-            document.getElementById('lobbyScreen').classList.remove('active');
-            document.getElementById('gameScreen').classList.add('active');
-            showQuestion();
-        }
-
-        function showQuestion() {
-            const q = questions[index];
-            document.getElementById('questionText').innerText = q.q;
-            document.getElementById('progressText').innerText = `${String(index + 1).padStart(2, '0')} / ${questions.length}`;
-            document.getElementById('progressBar').style.width = `${((index + 1) / questions.length) * 100}%`;
+        function initGame() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
             
-            const optionsEl = document.getElementById('optionsGrid');
-            optionsEl.innerHTML = "";
-            q.o.forEach((opt, i) => {
-                const btn = document.createElement('button');
-                btn.className = "w-full text-left bg-slate-800/50 border border-slate-700 p-3 md:p-4 rounded-xl hover:bg-slate-700 transition-all text-base md:text-lg flex items-center gap-4";
-                btn.innerHTML = `<span class="bg-slate-700 w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg text-sm font-bold text-cyan-400">${String.fromCharCode(65+i)}</span> <span class="flex-grow">${opt}</span>`;
-                btn.onclick = () => handleAnswer(i, btn);
-                optionsEl.appendChild(btn);
-            });
-            if (isRevisiting) addLog(`MEMPERBAIKI ERROR...`);
-        }
-
-        function handleAnswer(choice, btn) {
-            const q = questions[index];
-            const allBtns = document.querySelectorAll('#optionsGrid button');
-            allBtns.forEach(b => b.disabled = true);
-
-            if (choice === q.a) {
-                btn.classList.add('border-green-500', 'bg-green-500/20');
-                if (!isRevisiting) firstPassScore++;
-                addLog(`HASIL: BERHASIL`);
-            } else {
-                btn.classList.add('border-red-500', 'bg-red-500/20');
-                mistakes.push(q);
-                addLog(`HASIL: GAGAL (MENGULANG NANTI)`);
+            // Mengatur tipe kotak secara acak: Q (Question), B (Bomb), G (Gift)
+            boxTypes = new Array(totalBoxes).fill('Q');
+            
+            // Sisipkan Bom dan Bonus di posisi acak
+            const positions = Array.from({length: totalBoxes}, (_, i) => i);
+            for (let i = positions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [positions[i], positions[j]] = [positions[j], positions[i]];
             }
 
-            setTimeout(() => {
-                index++;
-                if (index < questions.length) showQuestion();
-                else if (mistakes.length > 0) {
-                    isRevisiting = true;
-                    questions = [...mistakes];
-                    mistakes = [];
-                    index = 0;
-                    alert("Ada beberapa modul yang gagal didekripsi. Sistem akan mengulang modul yang bermasalah.");
-                    showQuestion();
-                } else showSummary();
-            }, 1000);
+            boxTypes[positions[0]] = 'B'; 
+            boxTypes[positions[1]] = 'B';
+            boxTypes[positions[2]] = 'G';
+            boxTypes[positions[3]] = 'G';
+
+            for (let i = 0; i < totalBoxes; i++) {
+                const box = document.createElement('div');
+                box.className = 'mystery-box';
+                box.innerText = i + 1;
+                box.dataset.index = i;
+                box.onclick = () => openBox(box);
+                grid.appendChild(box);
+            }
         }
 
-        function addLog(msg) {
-            const logEl = document.getElementById('gameLog');
-            const p = document.createElement('p');
-            p.innerText = `> ${msg}`;
-            logEl.prepend(p);
-            if (logEl.children.length > 5) logEl.removeChild(logEl.lastChild);
+        document.getElementById('roll-btn').onclick = function() {
+            if (isRolling) return;
+            
+            isRolling = true;
+            const target = document.getElementById('target-name');
+            let counter = 0;
+            const maxTicks = 25;
+            
+            const interval = setInterval(() => {
+                const randomName = students[Math.floor(Math.random() * students.length)];
+                target.innerText = randomName;
+                target.style.opacity = (counter % 2 === 0) ? "0.5" : "1";
+                counter++;
+                
+                if (counter >= maxTicks) {
+                    clearInterval(interval);
+                    target.style.opacity = "1";
+                    target.innerText = "⭐ " + target.innerText + " ⭐";
+                    isRolling = false;
+                }
+            }, 70);
+        };
+
+        function openBox(el) {
+            if (el.classList.contains('opened')) return;
+
+            const type = boxTypes[parseInt(el.dataset.index)];
+            const modal = document.getElementById('modal');
+            const body = document.getElementById('modal-body');
+            modal.style.display = 'flex';
+
+            if (type === 'B') {
+                body.innerHTML = `
+                    <div class="text-8xl mb-4 animate-bounce">💣</div>
+                    <h2 class="text-4xl font-title text-red-600 mb-2">BOM MELEDAK!</h2>
+                    <p class="text-gray-600 text-lg mb-8">Waduh, tim harus rela kehilangan 50 poin!</p>
+                    <button onclick="resolveBox(true, ${el.dataset.index}, -50)" class="bg-red-500 text-white px-12 py-4 rounded-2xl font-bold shadow-xl hover:bg-red-600 active:scale-95 transition-all">TIDAAKK!</button>
+                `;
+            } else if (type === 'G') {
+                body.innerHTML = `
+                    <div class="text-8xl mb-4 animate-pulse">🎁</div>
+                    <h2 class="text-4xl font-title text-green-600 mb-2">BONUS HADIAH!</h2>
+                    <p class="text-gray-600 text-lg mb-8">Keberuntungan berpihak padamu! Tambahan 100 poin.</p>
+                    <button onclick="resolveBox(true, ${el.dataset.index}, 100)" class="bg-green-500 text-white px-12 py-4 rounded-2xl font-bold shadow-xl hover:bg-green-600 active:scale-95 transition-all">TERIMA KASIH!</button>
+                `;
+            } else {
+                // Pilih soal baru setiap kali kotak (yang belum terbuka permanen) diklik
+                const qIdx = Math.floor(Math.random() * bankSoal.length);
+                const q = bankSoal[qIdx];
+                
+                body.innerHTML = `
+                    <div class="text-xs font-bold text-indigo-400 mb-4 uppercase tracking-[0.2em]">Tantangan Kotak Nomor ${parseInt(el.dataset.index)+1}</div>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-8 text-left leading-relaxed">${q.q}</h2>
+                    <div class="space-y-3">
+                        ${q.o.map((opt, idx) => `
+                            <button onclick="checkAnswer(${idx}, ${q.a}, ${el.dataset.index})" class="option-btn group">
+                                <span class="w-10 h-10 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-xl mr-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">${String.fromCharCode(65+idx)}</span> 
+                                <span class="text-lg">${opt}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="mt-10 flex justify-center border-t pt-6">
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-rose-500 font-bold transition-colors">LEWATI KOTAK INI</button>
+                    </div>
+                `;
+            }
         }
 
-        function showSummary() {
-            const accuracy = Math.round((firstPassScore / initialQuestionsCount) * 100);
-            const isLulus = accuracy >= 75;
-            document.getElementById('sumAvatar').src = document.querySelectorAll('.avatar-card img')[player.avatar].src;
-            document.getElementById('sumName').innerText = player.name;
-            document.getElementById('sumRoom').innerText = `ROOM 0${currentRoom}: ${currentRoom === 1 ? 'KONSEP PELUANG' : currentRoom === 2 ? 'NILAI & KOMPLEMEN' : 'FREKUENSI HARAPAN'}`;
-            document.getElementById('sumAccuracy').innerText = `${accuracy}%`;
-            document.getElementById('sumTotal').innerText = `${initialQuestionsCount}/${initialQuestionsCount}`;
-            const badge = document.getElementById('sumBadge');
-            badge.innerText = isLulus ? "LULUS" : "GAGAL";
-            badge.className = `absolute -bottom-2 -right-2 font-bold px-3 py-1 rounded text-xs shadow-lg ${isLulus ? 'bg-green-500 text-black' : 'bg-red-500 text-white'}`;
-            document.getElementById('sumMessage').innerText = isLulus ? "Sistem Vault terbuka! Kamu telah menguasai probabilitas." : "Akurasi rendah. Kamu harus mencoba ruangan ini lagi.";
-            if (isLulus && currentRoom < 3 && !player.unlocked.includes(currentRoom + 1)) player.unlocked.push(currentRoom + 1);
-            document.getElementById('gameScreen').classList.remove('active');
-            document.getElementById('summaryScreen').classList.add('active');
+        function checkAnswer(selected, correct, boxIdx) {
+            const body = document.getElementById('modal-body');
+            if (selected === correct) {
+                body.innerHTML = `
+                    <div class="text-8xl mb-6">🤩</div>
+                    <h2 class="text-5xl font-title text-emerald-500 mb-4">BENAR!</h2>
+                    <p class="text-gray-600 mb-10 text-xl font-medium">Hebat! Kamu berhasil menjawab dengan tepat. Tim mendapatkan 20 poin!</p>
+                    <button onclick="resolveBox(true, ${boxIdx}, 20)" class="bg-indigo-600 text-white px-14 py-5 rounded-[25px] font-bold text-2xl shadow-2xl hover:bg-indigo-700 active:scale-95 transition-all">AMBIL POIN</button>
+                `;
+            } else {
+                body.innerHTML = `
+                    <div class="text-8xl mb-6">❌</div>
+                    <h2 class="text-5xl font-title text-rose-500 mb-4">SALAH!</h2>
+                    <p class="text-gray-600 mb-10 text-xl font-medium">Ups, jawabannya belum tepat. <br>Kotak akan ditutup lagi, pelajari lagi materinya ya!</p>
+                    <button onclick="closeModal()" class="bg-slate-800 text-white px-14 py-5 rounded-[25px] font-bold text-2xl shadow-2xl active:scale-95 transition-all">COBA LAGI NANTI</button>
+                `;
+            }
         }
 
-        function finishAndLobby() {
-            document.getElementById('summaryScreen').classList.remove('active');
-            document.getElementById('lobbyScreen').classList.add('active');
-            updateDoors();
+        function resolveBox(isFinished, boxIdx, pointChange) {
+            score += pointChange;
+            if (score < 0) score = 0;
+            document.getElementById('score-val').innerText = score;
+
+            if (isFinished) {
+                const box = document.querySelector(`.mystery-box[data-index="${boxIdx}"]`);
+                box.classList.add('opened');
+                box.innerHTML = '⭐'; // Tanda kotak sudah selesai
+                box.onclick = null;
+            }
+            closeModal();
         }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        window.onload = initGame;
     </script>
 </body>
 </html>
