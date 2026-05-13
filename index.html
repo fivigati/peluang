@@ -583,29 +583,26 @@
 function endSession() {
     gameState.sessionEnded = true;
 
-    // Update judul recap
     document.getElementById('recap-class-id').innerText =
         `MISSION LOG: KELAS ${gameState.currentClass}`;
 
-    // Ambil elemen tabel
     const body1 = document.getElementById('recap-body-1');
     const body2 = document.getElementById('recap-body-2');
 
-    // Kosongkan isi lama
     body1.innerHTML = "";
     body2.innerHTML = "";
 
-    // Urutkan skor terbesar
     const sorted = Object.entries(gameState.scores)
         .sort((a, b) => b[1] - a[1]);
 
-    // Bagi jadi 2 kolom
     const half = Math.ceil(sorted.length / 2);
 
     const firstHalf = sorted.slice(0, half);
     const secondHalf = sorted.slice(half);
 
-    // Generator row
+    // cek apakah ada skor positif
+    const hasPositiveScore = sorted.some(item => item[1] > 0);
+
     const createRow = ([name, score], idx, offset) => {
         const actualRank = idx + 1 + offset;
 
@@ -613,20 +610,24 @@ function endSession() {
         let rankClass = "text-slate-400";
         let rowClass = "hover:bg-white/5 transition-colors";
 
-        if (actualRank === 1) {
-            rankDisplay = "🥇";
-            rankClass = "text-xl";
-            rowClass = "bg-yellow-500/10";
-        }
-        else if (actualRank === 2) {
-            rankDisplay = "🥈";
-            rankClass = "text-xl";
-            rowClass = "bg-slate-400/10";
-        }
-        else if (actualRank === 3) {
-            rankDisplay = "🥉";
-            rankClass = "text-xl";
-            rowClass = "bg-amber-700/10";
+        // medal hanya muncul jika skornya > 0
+        if (hasPositiveScore && score > 0) {
+
+            if (actualRank === 1) {
+                rankDisplay = "🥇";
+                rankClass = "text-xl";
+                rowClass = "bg-yellow-500/10";
+            }
+            else if (actualRank === 2) {
+                rankDisplay = "🥈";
+                rankClass = "text-xl";
+                rowClass = "bg-slate-400/10";
+            }
+            else if (actualRank === 3) {
+                rankDisplay = "🥉";
+                rankClass = "text-xl";
+                rowClass = "bg-amber-700/10";
+            }
         }
 
         return `
@@ -646,34 +647,26 @@ function endSession() {
         `;
     };
 
-    // Isi tabel kiri
     firstHalf.forEach((data, i) => {
         body1.innerHTML += createRow(data, i, 0);
     });
 
-    // Isi tabel kanan
     secondHalf.forEach((data, i) => {
         body2.innerHTML += createRow(data, i, half);
     });
 
-    // Tampilkan modal recap
     const recapModal = document.getElementById('recap-modal');
 
     recapModal.classList.remove('hidden');
-
-    // Paksa tampil flex
     recapModal.style.display = "flex";
 
-    // Reset scroll modal
     recapModal.scrollTop = 0;
 
-    // Reset scroll window
     window.scrollTo({
         top: 0,
         behavior: "instant"
     });
 
-    // Force repaint browser
     requestAnimationFrame(() => {
         recapModal.scrollTop = 0;
     });
